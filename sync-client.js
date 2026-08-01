@@ -44,6 +44,34 @@
     return "asset-" + fnv1a64(identity);
   }
 
+  function stableEntityRecordId(entityType, parts) {
+    const cleanType = cleanEntityType(entityType);
+    const identity = (Array.isArray(parts) ? parts : [parts])
+      .map((part) => String(part == null ? "" : part).trim())
+      .join("|")
+      .normalize("NFKC");
+    return cleanType + "-" + fnv1a64(identity);
+  }
+
+  function displayRecordCode(recordId, entityType) {
+    const prefixes = {
+      asset: "AST",
+      property: "PRP",
+      canal_profile: "CNL",
+      license: "LIC",
+      violation: "VIO",
+      removal_decision: "REM",
+      human_resource: "HR",
+      lined_canal: "LIN",
+    };
+    const cleanType = cleanEntityType(entityType || "asset");
+    const suffix = fnv1a64(String(recordId || ""))
+      .slice(-8)
+      .toUpperCase()
+      .padStart(8, "0");
+    return (prefixes[cleanType] || "REC") + "-" + suffix;
+  }
+
   function cleanEntityType(value) {
     const entityType = String(value || "asset").trim();
     return /^[a-z][a-z0-9_]{0,39}$/.test(entityType) ? entityType : "asset";
@@ -155,6 +183,14 @@
 
     function getRecords(entityType) {
       return applyOverlay([], entityType);
+    }
+
+    function remoteCount(entityType) {
+      const cleanType = entityType ? cleanEntityType(entityType) : "";
+      return Object.values(getRemoteMap())
+        .map(normalizeChange)
+        .filter((change) => !change.deleted && (!cleanType || change.entityType === cleanType))
+        .length;
     }
 
     function queue(operation, asset, entityType) {
@@ -294,6 +330,7 @@
       pendingCount,
       applyOverlay,
       getRecords,
+      remoteCount,
       queueUpsert,
       queueDelete,
       clearConflicts,
@@ -301,5 +338,5 @@
     };
   }
 
-  root.IrrigationSync = { createSyncManager, stableRecordId };
+  root.IrrigationSync = { createSyncManager, stableRecordId, stableEntityRecordId, displayRecordCode };
 })(typeof window !== "undefined" ? window : globalThis);
