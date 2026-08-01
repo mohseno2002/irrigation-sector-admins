@@ -1,4 +1,4 @@
-const CACHE = "irrigation-sector-admins-v5";
+const CACHE = "irrigation-sector-admins-v6";
 const CORE = [
   "/",
   "/data/sector.json",

@@ -18,13 +18,13 @@
 }
 
 * { box-sizing: border-box; }
-html { height: 100%; overflow: hidden; scroll-behavior: auto; background: var(--paper); }
+html { min-height: 100%; overflow-x: hidden; overflow-y: scroll; scroll-behavior: auto; background: var(--paper); }
 body { margin: 0; background: var(--paper); color: var(--ink); font-family: "IBM Plex Sans Arabic", "Noto Sans Arabic", "Segoe UI", Tahoma, Arial, sans-serif; }
 button, input, select { font: inherit; }
 button, a, [role="tab"], summary, label { -webkit-tap-highlight-color: transparent; touch-action: manipulation; }
-body { height: 100%; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+body { min-height: 100%; overflow: visible; }
 a { color: inherit; text-decoration: none; }
-main { min-height: 100%; overflow: visible; scroll-behavior: auto; background: radial-gradient(circle at 0 2%, rgba(24,166,166,.09), transparent 21%), linear-gradient(180deg, #fbfdfe 0, var(--paper) 760px); }
+main { min-height: 100vh; overflow: visible; scroll-behavior: auto; background: radial-gradient(circle at 0 2%, rgba(24,166,166,.09), transparent 21%), linear-gradient(180deg, #fbfdfe 0, var(--paper) 760px); }
 
 .topbar { height: 78px; padding: 0 clamp(18px, 4vw, 64px); display: flex; align-items: center; gap: 38px; border-bottom: 1px solid rgba(213,230,237,.9); background: #fff; position: sticky; top: 0; z-index: 50; }
 .brand { display: flex; align-items: center; gap: 11px; min-width: 235px; }
@@ -343,9 +343,9 @@ footer small { margin-inline-start: auto; }
 }
 
 @media (max-width: 640px) {
-  html { height: 100%; overflow: hidden; scroll-behavior: auto; }
-  body { height: 100%; overflow-x: hidden; overflow-y: auto; -webkit-overflow-scrolling: touch; }
-  main { min-height: 100%; overflow: visible; padding-bottom: 26px; }
+  html { min-height: 100%; overflow-x: hidden; overflow-y: scroll; scroll-behavior: auto; }
+  body { min-height: 100%; overflow: visible; }
+  main { min-height: 100vh; overflow: visible; padding-bottom: 26px; }
   .topbar { height: 68px; padding: 0 14px; gap: 8px; position: static; }
   .topbar { background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; }
   .brand { min-width: 0; margin-inline-end: auto; }

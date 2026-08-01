@@ -81,7 +81,7 @@ const manifest = {
 };
 writeFileSync(new URL("manifest.webmanifest", docsDir), `${JSON.stringify(manifest, null, 2)}\n`);
 
-const serviceWorker = `const CACHE = "irrigation-sector-admins-github-v11";
+const serviceWorker = `const CACHE = "irrigation-sector-admins-github-v12";
 const ROOT = new URL("./", self.registration.scope).href;
 const CORE = ["./", "./data/sector.json.gz", "./manifest.webmanifest", "./pwa-icon.svg"]
   .map((path) => new URL(path, ROOT).href);
