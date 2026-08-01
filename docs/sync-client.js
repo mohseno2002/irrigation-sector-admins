@@ -54,9 +54,10 @@
   }
 
   function displayRecordCode(recordId, entityType) {
-    const prefixes = {
-      asset: "AST",
-      property: "PRP",
+      const prefixes = {
+        asset: "AST",
+        coverage: "COV",
+        property: "PRP",
       canal_profile: "CNL",
       license: "LIC",
       violation: "VIO",
