@@ -56,6 +56,7 @@
   function displayRecordCode(recordId, entityType) {
       const prefixes = {
         asset: "AST",
+        vehicle_equipment: "FLE",
         coverage: "COV",
         property: "PRP",
       canal_profile: "CNL",
