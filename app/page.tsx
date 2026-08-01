@@ -187,8 +187,9 @@ export default function Home() {
 
   useEffect(() => {
     if (!window.location.search.includes("diag")) return;
-    let lastY = window.scrollY;
-    let maxY = window.scrollY;
+    const scrollRoot = document.body;
+    let lastY = scrollRoot.scrollTop;
+    let maxY = scrollRoot.scrollTop;
     let jumps = 0;
     let lastJump = 0;
     let queued = false;
@@ -199,7 +200,7 @@ export default function Home() {
       scale: window.visualViewport ? Math.round(window.visualViewport.scale * 100) / 100 : 1,
       m640: window.matchMedia("(max-width: 640px)").matches,
       m1000: window.matchMedia("(max-width: 1000px)").matches,
-      y: Math.round(window.scrollY),
+      y: Math.round(scrollRoot.scrollTop),
       maxY: Math.round(maxY),
       jumps,
       lastJump,
@@ -213,7 +214,7 @@ export default function Home() {
       });
     };
     const onScroll = () => {
-      const y = window.scrollY;
+      const y = scrollRoot.scrollTop;
       if (y > maxY) maxY = y;
       const delta = y - lastY;
       if (delta < -60) {
@@ -223,11 +224,11 @@ export default function Home() {
       lastY = y;
       push();
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
+    scrollRoot.addEventListener("scroll", onScroll, { passive: true });
     window.visualViewport?.addEventListener("resize", push);
     setDiag(read());
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      scrollRoot.removeEventListener("scroll", onScroll);
       window.visualViewport?.removeEventListener("resize", push);
     };
   }, []);
@@ -733,7 +734,7 @@ export default function Home() {
         </nav>
         <div className="drawer-foot">
           <span className={online ? "drawer-state" : "drawer-state offline"}><i />{online ? "متصل · البيانات محمّلة" : "أوفلاين · النسخة المحفوظة"}</span>
-          <small>{number.format(totals.assets)} منشأة · الإصدار 4.0</small>
+          <small>{number.format(totals.assets)} منشأة · الإصدار 4.1</small>
         </div>
       </aside>
 
@@ -766,7 +767,7 @@ export default function Home() {
         </div>
       )}
 
-      <footer><b>إدارات قطاع الري</b><span>مبني على سجل البيانات المرفق دون إضافة بيانات افتراضية.</span><small>الإصدار 4.0</small></footer>
+      <footer><b>إدارات قطاع الري</b><span>مبني على سجل البيانات المرفق دون إضافة بيانات افتراضية.</span><small>الإصدار 4.1</small></footer>
     </main>
   );
 }
