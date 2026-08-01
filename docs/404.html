@@ -476,7 +476,7 @@
       footer small { margin:0; }
     }
 
-    /* Sector Platform 6 — professional hydraulic workspace */
+    /* Sector Platform 7 — complete digital coverage registry */
     :root {
       --navy:#123f46;
       --blue:#0b7088;
@@ -863,7 +863,7 @@
         <div class="tabs" role="tablist" aria-label="وحدات الإدارة">
           <button class="tab" role="tab" aria-selected="true" data-tab="structure">الهيكل الإداري</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="assets">الكباري والمنشآت</button>
-          <button class="tab" role="tab" aria-selected="false" data-tab="covers">التغطيات</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="coverage">التغطيات</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="property">الأملاك</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="canal_profile">أورنيك الترع</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="license">التراخيص</button>
@@ -898,12 +898,7 @@
           </div>
         </section>
 
-        <section class="tab-panel" data-panel="covers" hidden>
-          <div class="module">
-            <div class="module-intro"><span class="module-icon">▤</span><div><h3>التغطيات المسجلة</h3><p>حصر مستنتج فقط من اسم ونوع المنشأة داخل المصدر.</p></div><strong id="coverCount">—</strong></div>
-            <div class="cards-list" id="coverCards"></div>
-          </div>
-        </section>
+        <section class="tab-panel" data-panel="coverage" hidden><div class="records-module" data-record-module="coverage"></div></section>
 
         <section class="tab-panel" data-panel="property" hidden><div class="records-module" data-record-module="property"></div></section>
 
@@ -996,10 +991,10 @@
     </form>
   </dialog>
 
-  <footer><b>إدارات قطاع الري</b><span>منصة قطاعية شاملة مع مزامنة Google Sheets والعمل دون اتصال.</span><small>الإصدار Sector Platform 6.0 · أكواد رقمية تلقائية</small></footer>
+  <footer><b>إدارات قطاع الري</b><span>منصة قطاعية شاملة مع مزامنة Google Sheets والعمل دون اتصال.</span><small>الإصدار Sector Platform 7.0 · سجل رقمي وكود لكل عنصر</small></footer>
 
-  <script src="./sync-client.js?v=6"></script>
-  <script src="./platform-modules.js?v=6"></script>
+  <script src="./sync-client.js?v=7"></script>
+  <script src="./platform-modules.js?v=7"></script>
   <script>
     (() => {
       "use strict";
@@ -1120,6 +1115,37 @@
           });
         }
         return [...profiles.values()];
+      }
+
+      function makeBaseCoverageRecords(items) {
+        return items.filter(item => classify(item) === "تغطية").map(item => {
+          const recordId = window.IrrigationSync.stableEntityRecordId("coverage",[item.recordId]);
+          return {
+            recordId,
+            entityType:"coverage",
+            adm:item.adm,
+            eng:item.eng,
+            canalName:item.canal,
+            coverageName:item.name,
+            startKm:item.km,
+            endKm:null,
+            lengthM:item.length,
+            widthM:item.width,
+            coverageType:"",
+            purpose:item.use === "غير محدد" ? "" : item.use,
+            material:item.material === "غير محدد" ? "" : item.material,
+            executionYear:null,
+            structuralCondition:"غير مقيمة",
+            status:"عاملة",
+            lastInspectionDate:"",
+            latitude:item.lat,
+            longitude:item.lon,
+            documentUrl:"",
+            notes:"محول تلقائيًا من سجل المنشآت الأساسي.",
+            recordSource:"السجل الأساسي الرقمي",
+            version:0
+          };
+        });
       }
 
       function readiness(items) {
@@ -1307,15 +1333,6 @@
         byId("assetsTable").innerHTML = tableHtml(items,350);
       }
 
-      function renderCovers() {
-        if (!state.selected) return;
-        const covers = state.selected.assets.filter(item => classify(item) === "تغطية");
-        byId("coverCount").textContent = number.format(covers.length);
-        byId("coverCards").innerHTML = covers.length ? covers.slice(0,60).map(item =>
-          '<article class="small-card"><b>' + escapeHtml(item.name) + '</b><span>' + escapeHtml(item.canal) + '</span><small>' + escapeHtml(item.eng) + (item.length !== null ? ' · طول ' + item.length + ' م' : '') + '</small></article>'
-        ).join("") : '<div class="source-gap"><b>لا توجد تغطيات مصنفة</b>لم يُعثر على سجل يحمل دلالة تغطية داخل الإدارة المختارة.</div>';
-      }
-
       function renderQuality() {
         if (!state.selected) return;
         const items = state.selected.assets;
@@ -1357,7 +1374,6 @@
         byId("wsReadiness").textContent = number.format(summary.readiness) + "٪";
         renderStructure();
         renderAssets();
-        renderCovers();
         renderQuality();
         state.platform?.refresh();
       }
@@ -1558,6 +1574,7 @@
           state.data = payload;
           state.baseAssets = decode(payload);
           state.baseModuleRecords.canal_profile = makeBaseCanalProfiles(state.baseAssets);
+          state.baseModuleRecords.coverage = makeBaseCoverageRecords(state.baseAssets);
           refreshAllViews();
           setStatus("متصل · البيانات محمّلة");
           if (state.sync.isConfigured()) state.sync.sync(true).catch(() => undefined);
@@ -1657,7 +1674,7 @@
       },60000);
 
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("./sw.js?v=sector-platform-6",{updateViaCache:"none"}).catch(() => undefined);
+        navigator.serviceWorker.register("./sw.js?v=sector-platform-7",{updateViaCache:"none"}).catch(() => undefined);
       }
 
       initializeSync();
