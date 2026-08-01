@@ -16,6 +16,21 @@ const AUDIT_HEADERS = [
   "user", "device_id", "status", "server_version", "message", "entity_type",
 ];
 const ENTITY_DEFINITIONS = {
+  vehicle_equipment: {
+    sheet: "السيارات_والمعدات", required: ["adm", "assetName", "assetType"],
+    fields: [
+      ["adm", "الإدارة"], ["assetName", "اسم أو وصف السيارة/المعدة"], ["assetType", "نوع الأصل"], ["fleetNumber", "رقم الأسطول أو العهدة"],
+      ["eng", "الهندسة أو الوحدة"], ["workLocation", "موقع العمل"], ["plateNumber", "رقم اللوحات"], ["chassisNumber", "رقم الشاسيه"],
+      ["engineNumber", "رقم المحرك"], ["manufacturer", "الماركة أو الشركة المصنعة"], ["model", "الموديل"], ["manufactureYear", "سنة الصنع", "number", 1900, 2200],
+      ["ownershipType", "نوع الحيازة"], ["fuelType", "نوع الوقود أو الطاقة"], ["powerOrCapacity", "القدرة أو الحمولة"],
+      ["odometerKm", "عداد المسافة كم", "number"], ["operatingHours", "ساعات التشغيل", "number"], ["custodian", "السائق أو مسؤول العهدة"],
+      ["licenseNumber", "رقم الترخيص"], ["licenseExpiry", "انتهاء الترخيص", "date"], ["insuranceExpiry", "انتهاء التأمين", "date"],
+      ["lastMaintenanceDate", "آخر صيانة", "date"], ["nextMaintenanceDate", "الصيانة القادمة", "date"],
+      ["technicalCondition", "الحالة الفنية"], ["status", "الحالة التشغيلية"],
+      ["latitude", "دائرة العرض", "number", -90, 90], ["longitude", "خط الطول", "number", -180, 180],
+      ["documentUrl", "رابط المستند أو الصور"], ["notes", "ملاحظات"],
+    ],
+  },
   coverage: {
     sheet: "التغطيات", required: ["adm", "coverageName", "canalName", "eng"],
     fields: [
@@ -121,7 +136,7 @@ function doGet() {
     ok: true,
     service: "irrigation-sector-admins-sync",
     apiVersion: API_VERSION,
-    platformVersion: 5,
+    platformVersion: 6,
     entityTypes: Object.keys(ENTITY_DEFINITIONS),
     time: new Date().toISOString(),
   });
