@@ -23,10 +23,12 @@ const pagePath = new URL(`assets/${pageBundle}`, docsDir);
 let pageSource = readFileSync(pagePath, "utf8");
 const fetchPattern = "fetch(`/data/sector.json`).then(e=>{if(!e.ok)throw Error(`تعذر تحميل البيانات`);return e.json()})";
 const compressedFetch = "fetch(`./data/sector.json.gz`).then(async e=>{if(!e.ok)throw Error(`تعذر تحميل البيانات`);return JSON.parse(await new Response(e.body.pipeThrough(new DecompressionStream(`gzip`))).text())})";
+const serviceWorkerPattern = "navigator.serviceWorker.register(`/sw.js`)";
 if (!pageSource.includes(fetchPattern)) throw new Error("Dataset fetch signature changed during export.");
+if (!pageSource.includes(serviceWorkerPattern)) throw new Error("Service worker signature changed during export.");
 pageSource = pageSource
   .replace(fetchPattern, compressedFetch)
-  .replace("navigator.serviceWorker.register(`/sw.js`)", "navigator.serviceWorker.register(`./sw.js`)");
+  .replace(serviceWorkerPattern, "navigator.serviceWorker.register(`./sw.js?v=13`,{updateViaCache:`none`})");
 writeFileSync(pagePath, pageSource);
 
 // حزمة العميل تبنى روابط التحميل المسبق بجذر مطلق "/" فتفشل على GitHub Pages
@@ -50,10 +52,15 @@ const response = await worker.fetch(
 );
 
 if (!response.ok) throw new Error(`Static render failed with ${response.status}.`);
+const githubCacheGuard = `<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<script>if("caches"in self){caches.keys().then(function(keys){return Promise.all(keys.filter(function(key){return key.indexOf("irrigation-sector-admins-")===0}).map(function(key){return caches.delete(key)}))})}</script>`;
 const html = (await response.text())
   .replaceAll("/assets/", "./assets/")
   .replaceAll("/pwa-icon.svg", "./pwa-icon.svg")
-  .replaceAll("/manifest.webmanifest", "./manifest.webmanifest");
+  .replaceAll("/manifest.webmanifest", "./manifest.webmanifest")
+  .replace("</head>", `${githubCacheGuard}</head>`);
 writeFileSync(new URL("index.html", docsDir), html);
 writeFileSync(new URL("404.html", docsDir), html);
 
@@ -81,42 +88,22 @@ const manifest = {
 };
 writeFileSync(new URL("manifest.webmanifest", docsDir), `${JSON.stringify(manifest, null, 2)}\n`);
 
-const serviceWorker = `const CACHE = "irrigation-sector-admins-github-v12";
-const ROOT = new URL("./", self.registration.scope).href;
-const CORE = ["./", "./data/sector.json.gz", "./manifest.webmanifest", "./pwa-icon.svg"]
-  .map((path) => new URL(path, ROOT).href);
-
+const serviceWorker = `const CACHE_PREFIX = "irrigation-sector-admins-";
 self.addEventListener("install", (event) => {
-  event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(CORE)));
   self.skipWaiting();
 });
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(caches.keys().then((keys) =>
-    Promise.all(keys.filter((key) => key !== CACHE).map((key) => caches.delete(key)))
-  ));
-  self.clients.claim();
+    Promise.all(keys.filter((key) => key.startsWith(CACHE_PREFIX)).map((key) => caches.delete(key)))
+  ).then(() => self.clients.claim()));
 });
 
 self.addEventListener("fetch", (event) => {
   if (event.request.method !== "GET") return;
   const url = new URL(event.request.url);
   if (url.origin !== self.location.origin) return;
-  if (event.request.mode === "navigate") {
-    event.respondWith(fetch(event.request)
-      .then((response) => {
-        caches.open(CACHE).then((cache) => cache.put(ROOT, response.clone()));
-        return response;
-      })
-      .catch(() => caches.match(ROOT)));
-    return;
-  }
-  event.respondWith(caches.match(event.request).then((cached) =>
-    cached || fetch(event.request).then((response) => {
-      if (response.ok) caches.open(CACHE).then((cache) => cache.put(event.request, response.clone()));
-      return response;
-    })
-  ));
+  event.respondWith(fetch(event.request, { cache: "no-store" }));
 });
 `;
 writeFileSync(new URL("sw.js", docsDir), serviceWorker);
