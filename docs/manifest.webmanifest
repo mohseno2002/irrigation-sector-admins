@@ -5,7 +5,7 @@
   "lang": "ar",
   "dir": "rtl",
   "id": "./",
-  "start_url": "./?source=static-pwa-1",
+  "start_url": "./?source=sync-pwa-2",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
