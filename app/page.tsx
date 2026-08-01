@@ -176,17 +176,6 @@ export default function Home() {
     };
   }, []);
 
-  useEffect(() => {
-    if (!selected) return;
-    const timer = window.setTimeout(() => {
-      document.getElementById("admin-workspace")?.scrollIntoView({
-        behavior: "auto",
-        block: "start",
-      });
-    }, 80);
-    return () => window.clearTimeout(timer);
-  }, [selected]);
-
   const summaries = useMemo(() => makeSummaries(assets), [assets]);
   const filtered = useMemo(() => {
     const normalized = query.trim();
@@ -624,7 +613,7 @@ export default function Home() {
         </div>
       )}
 
-      <footer><b>إدارات قطاع الري</b><span>مبني على سجل البيانات المرفق دون إضافة بيانات افتراضية.</span><small>الإصدار 2.0</small></footer>
+      <footer><b>إدارات قطاع الري</b><span>مبني على سجل البيانات المرفق دون إضافة بيانات افتراضية.</span><small>الإصدار 5.0 · ثبات أندرويد</small></footer>
     </main>
   );
 }
