@@ -476,7 +476,7 @@
       footer small { margin:0; }
     }
 
-    /* Sector Platform 7 — complete digital coverage registry */
+    /* Sector Platform 8 — complete fleet and equipment registry */
     :root {
       --navy:#123f46;
       --blue:#0b7088;
@@ -870,6 +870,7 @@
           <button class="tab" role="tab" aria-selected="false" data-tab="violation">محاضر المخالفات</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="removal_decision">قرارات الإزالة</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="human_resource">الموارد البشرية</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="vehicle_equipment">السيارات والمعدات</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="lined_canal">الترع المبطنة</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="quality">جودة البيانات</button>
         </div>
@@ -907,6 +908,7 @@
         <section class="tab-panel" data-panel="violation" hidden><div class="records-module" data-record-module="violation"></div></section>
         <section class="tab-panel" data-panel="removal_decision" hidden><div class="records-module" data-record-module="removal_decision"></div></section>
         <section class="tab-panel" data-panel="human_resource" hidden><div class="records-module" data-record-module="human_resource"></div></section>
+        <section class="tab-panel" data-panel="vehicle_equipment" hidden><div class="records-module" data-record-module="vehicle_equipment"></div></section>
         <section class="tab-panel" data-panel="lined_canal" hidden><div class="records-module" data-record-module="lined_canal"></div></section>
 
         <section class="tab-panel" data-panel="quality" hidden>
@@ -991,10 +993,10 @@
     </form>
   </dialog>
 
-  <footer><b>إدارات قطاع الري</b><span>منصة قطاعية شاملة مع مزامنة Google Sheets والعمل دون اتصال.</span><small>الإصدار Sector Platform 7.0 · سجل رقمي وكود لكل عنصر</small></footer>
+  <footer><b>إدارات قطاع الري</b><span>منصة قطاعية شاملة مع مزامنة Google Sheets والعمل دون اتصال.</span><small>الإصدار Sector Platform 8.0 · سجل رقمي للسيارات والمعدات</small></footer>
 
-  <script src="./sync-client.js?v=7"></script>
-  <script src="./platform-modules.js?v=7"></script>
+  <script src="./sync-client.js?v=8"></script>
+  <script src="./platform-modules.js?v=8"></script>
   <script>
     (() => {
       "use strict";
@@ -1674,7 +1676,7 @@
       },60000);
 
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("./sw.js?v=sector-platform-7",{updateViaCache:"none"}).catch(() => undefined);
+        navigator.serviceWorker.register("./sw.js?v=sector-platform-8",{updateViaCache:"none"}).catch(() => undefined);
       }
 
       initializeSync();
