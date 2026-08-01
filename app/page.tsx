@@ -186,9 +186,22 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
+    const shell = document.querySelector<HTMLElement>("main");
+    if (!shell) return;
+    const dropKeyboard = () => {
+      const active = document.activeElement as HTMLElement | null;
+      if (active && (active.tagName === "INPUT" || active.tagName === "SELECT")) active.blur();
+    };
+    shell.addEventListener("touchmove", dropKeyboard, { passive: true });
+    return () => shell.removeEventListener("touchmove", dropKeyboard);
+  }, []);
+
+  useEffect(() => {
     if (!window.location.search.includes("diag")) return;
-    let lastY = window.scrollY;
-    let maxY = window.scrollY;
+    const shell = document.querySelector<HTMLElement>("main");
+    if (!shell) return;
+    let lastY = shell.scrollTop;
+    let maxY = shell.scrollTop;
     let jumps = 0;
     let lastJump = 0;
     let queued = false;
@@ -199,7 +212,7 @@ export default function Home() {
       scale: window.visualViewport ? Math.round(window.visualViewport.scale * 100) / 100 : 1,
       m640: window.matchMedia("(max-width: 640px)").matches,
       m1000: window.matchMedia("(max-width: 1000px)").matches,
-      y: Math.round(window.scrollY),
+      y: Math.round(shell.scrollTop),
       maxY: Math.round(maxY),
       jumps,
       lastJump,
@@ -213,7 +226,7 @@ export default function Home() {
       });
     };
     const onScroll = () => {
-      const y = window.scrollY;
+      const y = shell.scrollTop;
       if (y > maxY) maxY = y;
       const delta = y - lastY;
       if (delta < -60) {
@@ -223,11 +236,11 @@ export default function Home() {
       lastY = y;
       push();
     };
-    window.addEventListener("scroll", onScroll, { passive: true });
+    shell.addEventListener("scroll", onScroll, { passive: true });
     window.visualViewport?.addEventListener("resize", push);
     setDiag(read());
     return () => {
-      window.removeEventListener("scroll", onScroll);
+      shell.removeEventListener("scroll", onScroll);
       window.visualViewport?.removeEventListener("resize", push);
     };
   }, []);
@@ -434,7 +447,7 @@ export default function Home() {
         <div className="top-actions">
           <span className={`source-status ${online ? "" : "offline"}`}><i /> {online ? "متصل · البيانات محمّلة" : "أوفلاين · النسخة المحفوظة"}</span>
           <button className="install-button" onClick={installApp}>تثبيت التطبيق</button>
-          <button className="icon-button" aria-label="البحث" onClick={() => document.getElementById("admin-search")?.focus()}>⌕</button>
+          <button className="icon-button" aria-label="البحث" onClick={() => document.getElementById("admin-search")?.scrollIntoView({ behavior: "auto", block: "center" })}>⌕</button>
         </div>
       </header>
 
@@ -728,12 +741,12 @@ export default function Home() {
           <a href="#sector-dashboard" onClick={() => setMenuOpen(false)}><b>◫</b><span>لوحة القطاع</span><i>{data ? `${number.format(globalReadiness)}٪` : "—"}</i></a>
           <a href="#administrations" onClick={() => setMenuOpen(false)}><b>▥</b><span>الإدارات العامة</span><i>{data ? number.format(totals.administrations) : "—"}</i></a>
           <a href="#admin-workspace" onClick={() => setMenuOpen(false)}><b>⌖</b><span>مساحة الإدارة</span><i>{selectedSummary ? "مفتوحة" : "—"}</i></a>
-          <button type="button" onClick={() => { setMenuOpen(false); window.setTimeout(() => document.getElementById("admin-search")?.focus(), 260); }}><b>⌕</b><span>بحث فى الإدارات</span></button>
+          <button type="button" onClick={() => { setMenuOpen(false); window.setTimeout(() => document.getElementById("admin-search")?.scrollIntoView({ behavior: "auto", block: "center" }), 300); }}><b>⌕</b><span>بحث فى الإدارات</span></button>
           <button type="button" onClick={() => { setMenuOpen(false); installApp(); }}><b>⇩</b><span>تثبيت التطبيق</span></button>
         </nav>
         <div className="drawer-foot">
           <span className={online ? "drawer-state" : "drawer-state offline"}><i />{online ? "متصل · البيانات محمّلة" : "أوفلاين · النسخة المحفوظة"}</span>
-          <small>{number.format(totals.assets)} منشأة · الإصدار 3.1</small>
+          <small>{number.format(totals.assets)} منشأة · الإصدار 3.2</small>
         </div>
       </aside>
 
@@ -766,7 +779,7 @@ export default function Home() {
         </div>
       )}
 
-      <footer><b>إدارات قطاع الري</b><span>مبني على سجل البيانات المرفق دون إضافة بيانات افتراضية.</span><small>الإصدار 3.1</small></footer>
+      <footer><b>إدارات قطاع الري</b><span>مبني على سجل البيانات المرفق دون إضافة بيانات افتراضية.</span><small>الإصدار 3.2</small></footer>
     </main>
   );
 }
