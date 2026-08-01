@@ -29,6 +29,17 @@ pageSource = pageSource
   .replace("navigator.serviceWorker.register(`/sw.js`)", "navigator.serviceWorker.register(`./sw.js`)");
 writeFileSync(pagePath, pageSource);
 
+// حزمة العميل تبنى روابط التحميل المسبق بجذر مطلق "/" فتفشل على GitHub Pages
+// (المشروع منشور تحت مسار فرعى). نحوّلها لتُحسب من مسار الصفحة نفسها.
+const clientBundle = readdirSync(docsAssetsDir).find((file) => file.startsWith("index-") && file.endsWith(".js"));
+if (!clientBundle) throw new Error("GitHub Pages export could not find the client bundle.");
+const clientPath = new URL(`assets/${clientBundle}`, docsDir);
+let clientSource = readFileSync(clientPath, "utf8");
+const assetsBasePattern = "function(e){return`/`+e}";
+if (!clientSource.includes(assetsBasePattern)) throw new Error("Asset base signature changed during export.");
+clientSource = clientSource.replace(assetsBasePattern, "function(e){return new URL(e,document.baseURI).href}");
+writeFileSync(clientPath, clientSource);
+
 const workerUrl = new URL("../dist/server/index.js", import.meta.url);
 workerUrl.searchParams.set("export", `${Date.now()}`);
 const { default: worker } = await import(workerUrl.href);
@@ -70,7 +81,7 @@ const manifest = {
 };
 writeFileSync(new URL("manifest.webmanifest", docsDir), `${JSON.stringify(manifest, null, 2)}\n`);
 
-const serviceWorker = `const CACHE = "irrigation-sector-admins-github-v5";
+const serviceWorker = `const CACHE = "irrigation-sector-admins-github-v6";
 const ROOT = new URL("./", self.registration.scope).href;
 const CORE = ["./", "./data/sector.json.gz", "./manifest.webmanifest", "./pwa-icon.svg"]
   .map((path) => new URL(path, ROOT).href);
