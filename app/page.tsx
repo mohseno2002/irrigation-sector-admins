@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type RawData = {
   generatedFrom: string;
@@ -45,21 +45,6 @@ type AdminSummary = {
 };
 
 type WorkspaceTab = "structure" | "assets" | "coverages" | "properties" | "quality";
-
-type FocusLevel = "engineers" | "canals" | "assets";
-
-type DiagState = {
-  w: number;
-  h: number;
-  vv: number;
-  scale: number;
-  m640: boolean;
-  m1000: boolean;
-  y: number;
-  maxY: number;
-  jumps: number;
-  lastJump: number;
-};
 
 type InstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -147,9 +132,6 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("structure");
-  const [focusLevel, setFocusLevel] = useState<FocusLevel>("engineers");
-  const [focusTick, setFocusTick] = useState(0);
-  const focusRequest = useRef(0);
   const [selectedEngineer, setSelectedEngineer] = useState<string | null>(null);
   const [selectedCanal, setSelectedCanal] = useState<string | null>(null);
   const [assetQuery, setAssetQuery] = useState("");
@@ -157,8 +139,6 @@ export default function Home() {
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
   const [showInstallGuide, setShowInstallGuide] = useState(false);
   const [online, setOnline] = useState(true);
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [diag, setDiag] = useState<DiagState | null>(null);
 
   useEffect(() => {
     fetch("/data/sector.json")
@@ -186,62 +166,6 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (!window.location.search.includes("diag")) return;
-    let lastY = window.scrollY;
-    let maxY = window.scrollY;
-    let jumps = 0;
-    let lastJump = 0;
-    let queued = false;
-    const read = (): DiagState => ({
-      w: window.innerWidth,
-      h: window.innerHeight,
-      vv: window.visualViewport ? Math.round(window.visualViewport.height) : 0,
-      scale: window.visualViewport ? Math.round(window.visualViewport.scale * 100) / 100 : 1,
-      m640: window.matchMedia("(max-width: 640px)").matches,
-      m1000: window.matchMedia("(max-width: 1000px)").matches,
-      y: Math.round(window.scrollY),
-      maxY: Math.round(maxY),
-      jumps,
-      lastJump,
-    });
-    const push = () => {
-      if (queued) return;
-      queued = true;
-      window.requestAnimationFrame(() => {
-        queued = false;
-        setDiag(read());
-      });
-    };
-    const onScroll = () => {
-      const y = window.scrollY;
-      if (y > maxY) maxY = y;
-      const delta = y - lastY;
-      if (delta < -60) {
-        jumps += 1;
-        lastJump = Math.round(delta);
-      }
-      lastY = y;
-      push();
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.visualViewport?.addEventListener("resize", push);
-    setDiag(read());
-    return () => {
-      window.removeEventListener("scroll", onScroll);
-      window.visualViewport?.removeEventListener("resize", push);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!menuOpen) return;
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setMenuOpen(false);
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [menuOpen]);
-
-  useEffect(() => {
     const sync = () => setOnline(navigator.onLine);
     sync();
     window.addEventListener("online", sync);
@@ -254,20 +178,14 @@ export default function Home() {
 
   useEffect(() => {
     if (!selected) return;
-    const target =
-      focusLevel === "canals"
-        ? ".canal-panel"
-        : focusLevel === "assets"
-          ? ".assets-panel"
-          : null;
     const timer = window.setTimeout(() => {
-      const node = target
-        ? document.querySelector<HTMLElement>(target)
-        : document.getElementById("admin-workspace");
-      node?.scrollIntoView({ behavior: "auto", block: "start" });
-    }, 90);
+      document.getElementById("admin-workspace")?.scrollIntoView({
+        behavior: "auto",
+        block: "start",
+      });
+    }, 80);
     return () => window.clearTimeout(timer);
-  }, [selected, focusLevel, focusTick]);
+  }, [selected]);
 
   const summaries = useMemo(() => makeSummaries(assets), [assets]);
   const filtered = useMemo(() => {
@@ -301,32 +219,13 @@ export default function Home() {
 
   const globalReadiness = useMemo(() => getReadiness(assets), [assets]);
 
-  const openAdmin = (name: string, focus: FocusLevel = "engineers") => {
+  const openAdmin = (name: string) => {
     setSelected(name);
-    setActiveTab(focus === "assets" ? "assets" : "structure");
+    setActiveTab("structure");
     setSelectedEngineer(null);
     setSelectedCanal(null);
     setAssetQuery("");
     setCategory("الكل");
-    setFocusLevel(focus);
-    focusRequest.current += 1;
-    setFocusTick(focusRequest.current);
-  };
-
-  const selectWorkspaceTab = (nextTab: WorkspaceTab) => {
-    if (nextTab === activeTab) return;
-
-    // لا نلمس تمرير الصفحة العمودي هنا إطلاقًا: أي window.scrollTo بعد تبديل
-    // التبويب يتصارع مع تصحيح المتصفح لارتفاع المستند فينتج اهتزاز متكرر على
-    // الموبايل. نكتفي بالحفاظ على موضع شريط التبويبات الأفقي فقط.
-    const tabStrip = document.querySelector<HTMLElement>(".workspace-tabs");
-    const currentTabScroll = tabStrip?.scrollLeft ?? 0;
-
-    setActiveTab(nextTab);
-
-    window.requestAnimationFrame(() => {
-      if (tabStrip) tabStrip.scrollLeft = currentTabScroll;
-    });
   };
 
   const selectedSummary = summaries.find((item) => item.name === selected) ?? null;
@@ -416,9 +315,6 @@ export default function Home() {
   return (
     <main dir="rtl">
       <header className="topbar">
-        <button className="menu-button" aria-label="فتح القائمة" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}>
-          <i /><i /><i />
-        </button>
         <a className="brand" href="#top" aria-label="إدارات قطاع الري">
           <span className="brand-wave">≈</span>
           <span><b>إدارات قطاع الري</b><small>منصة الأصول والمنشآت المائية</small></span>
@@ -427,14 +323,14 @@ export default function Home() {
           <a className="active" href="#top">الرئيسية</a>
           <a href="#sector-dashboard">لوحة القطاع</a>
           <a href="#administrations">الإدارات</a>
-          <a href="#admin-workspace">الهندسات</a>
-          <a href="#admin-workspace">الترع</a>
-          <a href="#admin-workspace">المنشآت</a>
+          <a href="#administrations">الهندسات</a>
+          <a href="#administrations">الترع</a>
+          <a href="#administrations">المنشآت</a>
         </nav>
         <div className="top-actions">
           <span className={`source-status ${online ? "" : "offline"}`}><i /> {online ? "متصل · البيانات محمّلة" : "أوفلاين · النسخة المحفوظة"}</span>
           <button className="install-button" onClick={installApp}>تثبيت التطبيق</button>
-          <button className="icon-button" aria-label="البحث" onClick={() => document.getElementById("admin-search")?.scrollIntoView({ behavior: "auto", block: "center" })}>⌕</button>
+          <button className="icon-button" aria-label="البحث" onClick={() => document.getElementById("admin-search")?.focus()}>⌕</button>
         </div>
       </header>
 
@@ -537,20 +433,20 @@ export default function Home() {
           <div className="admin-grid">
             {!data && Array.from({ length: 6 }).map((_, index) => <div className="admin-card skeleton" key={index} />)}
             {filtered.map((admin, index) => (
-              <article className="admin-card" key={admin.name} style={{ "--delay": `${Math.min(index, 10) * 35}ms` } as React.CSSProperties}>
-                <button type="button" className="admin-card-head" onClick={() => openAdmin(admin.name, "engineers")}>
+              <button className="admin-card" key={admin.name} onClick={() => openAdmin(admin.name)} style={{ "--delay": `${Math.min(index, 10) * 35}ms` } as React.CSSProperties}>
+                <div className="admin-card-head">
                   <span className="admin-icon">{String(index + 1).padStart(2, "0")}</span>
                   <div><small>{admin.governorates.join(" · ")}</small><h3>{admin.name}</h3></div>
                   <span className="arrow">↙</span>
-                </button>
-                <div className="admin-stats">
-                  <button type="button" aria-label={`عرض أسماء الهندسات التابعة لـ${admin.name}`} onClick={() => openAdmin(admin.name, "engineers")}><b>{number.format(admin.engineers)}</b> هندسة</button>
-                  <button type="button" aria-label={`عرض أسماء الترع التابعة لـ${admin.name}`} onClick={() => openAdmin(admin.name, "canals")}><b>{number.format(admin.canals)}</b> ترعة</button>
-                  <button type="button" aria-label={`عرض منشآت ${admin.name}`} onClick={() => openAdmin(admin.name, "assets")}><b>{number.format(admin.assets.length)}</b> منشأة</button>
                 </div>
-                <div className="admin-modules"><button type="button" onClick={() => openAdmin(admin.name, "assets")}>الكباري</button><span className="pending">التغطيات</span><span className="pending">الأملاك</span></div>
-                <div className="card-foot"><span>اضغط أي رقم بالأعلى لعرض أسمائه · جاهزية البيانات {number.format(admin.readiness)}٪</span><i><b style={{ width: `${admin.readiness}%` }} /></i></div>
-              </article>
+                <div className="admin-stats">
+                  <span><b>{number.format(admin.engineers)}</b> هندسة</span>
+                  <span><b>{number.format(admin.canals)}</b> ترعة</span>
+                  <span><b>{number.format(admin.assets.length)}</b> منشأة</span>
+                </div>
+                <div className="admin-modules"><span>الكباري</span><span className="pending">التغطيات</span><span className="pending">الأملاك</span></div>
+                <div className="card-foot"><span>جاهزية البيانات {number.format(admin.readiness)}٪</span><i><b style={{ width: `${admin.readiness}%` }} /></i></div>
+              </button>
             ))}
           </div>
           {!filtered.length && data && <div className="empty-state">لا توجد إدارة مطابقة لعبارة البحث.</div>}
@@ -596,27 +492,14 @@ export default function Home() {
                 ["properties", "الأملاك"],
                 ["quality", "جودة البيانات"],
               ].map(([id, label]) => (
-                <button
-                  key={id}
-                  type="button"
-                  role="tab"
-                  aria-selected={activeTab === id}
-                  className={activeTab === id ? "active" : ""}
-                  onClick={(event) => {
-                    event.currentTarget.blur();
-                    selectWorkspaceTab(id as WorkspaceTab);
-                  }}
-                >
-                  {label}
-                </button>
+                <button key={id} role="tab" aria-selected={activeTab === id} className={activeTab === id ? "active" : ""} onClick={() => setActiveTab(id as WorkspaceTab)}>{label}</button>
               ))}
             </div>
 
-            <div className="workspace-content-shell">
             {(activeTab === "structure" || activeTab === "assets") && (
               <div className="asset-browser">
-                <aside className={focusLevel === "engineers" ? "engineer-panel focused" : "engineer-panel"}>
-                  <div className="panel-title"><div><span>المستوى الأول</span><h3>أسماء الهندسات التابعة</h3></div><b>{number.format(engineers.length)}</b></div>
+                <aside className="engineer-panel">
+                  <div className="panel-title"><div><span>المستوى الأول</span><h3>الهندسات التابعة</h3></div><b>{number.format(engineers.length)}</b></div>
                   <button className={!selectedEngineer ? "selected" : ""} onClick={() => { setSelectedEngineer(null); setSelectedCanal(null); }}>
                     <span><b>كل الهندسات</b><small>عرض كامل نطاق الإدارة</small></span><strong>{number.format(selectedSummary.assets.length)}</strong>
                   </button>
@@ -629,8 +512,8 @@ export default function Home() {
                   </div>
                 </aside>
 
-                <aside className={focusLevel === "canals" ? "canal-panel focused" : "canal-panel"}>
-                  <div className="panel-title"><div><span>المستوى الثاني</span><h3>أسماء الترع والمجاري</h3></div><b>{number.format(canals.length)}</b></div>
+                <aside className="canal-panel">
+                  <div className="panel-title"><div><span>المستوى الثاني</span><h3>الترع والمجاري</h3></div><b>{number.format(canals.length)}</b></div>
                   <button className={!selectedCanal ? "selected" : ""} onClick={() => setSelectedCanal(null)}>
                     <span><b>كل الترع</b><small>{selectedEngineer || selectedSummary.name}</small></span><strong>{number.format(engineerAssets.length)}</strong>
                   </button>
@@ -710,32 +593,17 @@ export default function Home() {
                 <div className="quality-note"><b>مهم:</b> جاهزية البيانات لا تعبّر عن الحالة الإنشائية. قرار الصيانة أو الإحلال يحتاج فحصًا ميدانيًا وبيانات عمر المنشأ والأحمال والنحر والاختبارات.</div>
               </div>
             )}
-            </div>
           </>
         )}
       </section>
 
-      <div className={menuOpen ? "drawer-scrim open" : "drawer-scrim"} onClick={() => setMenuOpen(false)} />
-
-      <aside className={menuOpen ? "side-drawer open" : "side-drawer"} aria-label="القائمة الرئيسية" aria-hidden={!menuOpen}>
-        <div className="drawer-head">
-          <span className="brand-wave">≈</span>
-          <div><b>إدارات قطاع الري</b><small>منصة الأصول والمنشآت المائية</small></div>
-          <button className="drawer-close" aria-label="إغلاق القائمة" onClick={() => setMenuOpen(false)}>×</button>
-        </div>
-        <nav className="drawer-nav">
-          <a href="#top" onClick={() => setMenuOpen(false)}><b>⌂</b><span>الرئيسية</span></a>
-          <a href="#sector-dashboard" onClick={() => setMenuOpen(false)}><b>◫</b><span>لوحة القطاع</span><i>{data ? `${number.format(globalReadiness)}٪` : "—"}</i></a>
-          <a href="#administrations" onClick={() => setMenuOpen(false)}><b>▥</b><span>الإدارات العامة</span><i>{data ? number.format(totals.administrations) : "—"}</i></a>
-          <a href="#admin-workspace" onClick={() => setMenuOpen(false)}><b>⌖</b><span>مساحة الإدارة</span><i>{selectedSummary ? "مفتوحة" : "—"}</i></a>
-          <button type="button" onClick={() => { setMenuOpen(false); window.setTimeout(() => document.getElementById("admin-search")?.scrollIntoView({ behavior: "auto", block: "center" }), 300); }}><b>⌕</b><span>بحث فى الإدارات</span></button>
-          <button type="button" onClick={() => { setMenuOpen(false); installApp(); }}><b>⇩</b><span>تثبيت التطبيق</span></button>
-        </nav>
-        <div className="drawer-foot">
-          <span className={online ? "drawer-state" : "drawer-state offline"}><i />{online ? "متصل · البيانات محمّلة" : "أوفلاين · النسخة المحفوظة"}</span>
-          <small>{number.format(totals.assets)} منشأة · الإصدار 4.2</small>
-        </div>
-      </aside>
+      <nav className="mobile-dock" aria-label="تنقل الموبايل">
+        <a href="#top"><b>⌂</b><span>الرئيسية</span></a>
+        <a href="#sector-dashboard"><b>◫</b><span>القطاع</span></a>
+        <a className="dock-main" href="#administrations"><b>▥</b><span>الإدارات</span></a>
+        <button onClick={() => document.getElementById("admin-search")?.focus()}><b>⌕</b><span>بحث</span></button>
+        <button onClick={installApp}><b>⇩</b><span>تثبيت</span></button>
+      </nav>
 
       {showInstallGuide && (
         <div className="install-overlay" role="dialog" aria-modal="true" aria-labelledby="install-title" onClick={(event) => { if (event.target === event.currentTarget) setShowInstallGuide(false); }}>
@@ -756,17 +624,7 @@ export default function Home() {
         </div>
       )}
 
-      {diag && (
-        <div className="diag-badge">
-          <b>لوحة التشخيص</b>
-          <span>العرض {diag.w}×{diag.h} · نافذة مرئية {diag.vv}</span>
-          <span>≤640 {diag.m640 ? "✓" : "✗"} · ≤1000 {diag.m1000 ? "✓" : "✗"} · تكبير {diag.scale}</span>
-          <span>y={diag.y} · أقصى {diag.maxY}</span>
-          <span>قفزات للأعلى: {diag.jumps}{diag.lastJump ? ` · آخرها ${diag.lastJump}` : ""}</span>
-        </div>
-      )}
-
-      <footer><b>إدارات قطاع الري</b><span>مبني على سجل البيانات المرفق دون إضافة بيانات افتراضية.</span><small>الإصدار 4.2</small></footer>
+      <footer><b>إدارات قطاع الري</b><span>مبني على سجل البيانات المرفق دون إضافة بيانات افتراضية.</span><small>الإصدار 2.0</small></footer>
     </main>
   );
 }
