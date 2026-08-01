@@ -144,6 +144,7 @@ export default function Home() {
   const [installPrompt, setInstallPrompt] = useState<InstallPromptEvent | null>(null);
   const [showInstallGuide, setShowInstallGuide] = useState(false);
   const [online, setOnline] = useState(true);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     fetch("/data/sector.json")
@@ -169,6 +170,15 @@ export default function Home() {
     window.addEventListener("beforeinstallprompt", installHandler);
     return () => window.removeEventListener("beforeinstallprompt", installHandler);
   }, []);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [menuOpen]);
 
   useEffect(() => {
     const sync = () => setOnline(navigator.onLine);
@@ -345,6 +355,9 @@ export default function Home() {
   return (
     <main dir="rtl">
       <header className="topbar">
+        <button className="menu-button" aria-label="فتح القائمة" aria-expanded={menuOpen} onClick={() => setMenuOpen(true)}>
+          <i /><i /><i />
+        </button>
         <a className="brand" href="#top" aria-label="إدارات قطاع الري">
           <span className="brand-wave">≈</span>
           <span><b>إدارات قطاع الري</b><small>منصة الأصول والمنشآت المائية</small></span>
@@ -641,13 +654,27 @@ export default function Home() {
         )}
       </section>
 
-      <nav className="mobile-dock" aria-label="تنقل الموبايل">
-        <a href="#top"><b>⌂</b><span>الرئيسية</span></a>
-        <a href="#sector-dashboard"><b>◫</b><span>القطاع</span></a>
-        <a className="dock-main" href="#administrations"><b>▥</b><span>الإدارات</span></a>
-        <button onClick={() => document.getElementById("admin-search")?.focus()}><b>⌕</b><span>بحث</span></button>
-        <button onClick={installApp}><b>⇩</b><span>تثبيت</span></button>
-      </nav>
+      <div className={menuOpen ? "drawer-scrim open" : "drawer-scrim"} onClick={() => setMenuOpen(false)} />
+
+      <aside className={menuOpen ? "side-drawer open" : "side-drawer"} aria-label="القائمة الرئيسية" aria-hidden={!menuOpen}>
+        <div className="drawer-head">
+          <span className="brand-wave">≈</span>
+          <div><b>إدارات قطاع الري</b><small>منصة الأصول والمنشآت المائية</small></div>
+          <button className="drawer-close" aria-label="إغلاق القائمة" onClick={() => setMenuOpen(false)}>×</button>
+        </div>
+        <nav className="drawer-nav">
+          <a href="#top" onClick={() => setMenuOpen(false)}><b>⌂</b><span>الرئيسية</span></a>
+          <a href="#sector-dashboard" onClick={() => setMenuOpen(false)}><b>◫</b><span>لوحة القطاع</span><i>{data ? `${number.format(globalReadiness)}٪` : "—"}</i></a>
+          <a href="#administrations" onClick={() => setMenuOpen(false)}><b>▥</b><span>الإدارات العامة</span><i>{data ? number.format(totals.administrations) : "—"}</i></a>
+          <a href="#admin-workspace" onClick={() => setMenuOpen(false)}><b>⌖</b><span>مساحة الإدارة</span><i>{selectedSummary ? "مفتوحة" : "—"}</i></a>
+          <button type="button" onClick={() => { setMenuOpen(false); window.setTimeout(() => document.getElementById("admin-search")?.focus(), 260); }}><b>⌕</b><span>بحث فى الإدارات</span></button>
+          <button type="button" onClick={() => { setMenuOpen(false); installApp(); }}><b>⇩</b><span>تثبيت التطبيق</span></button>
+        </nav>
+        <div className="drawer-foot">
+          <span className={online ? "drawer-state" : "drawer-state offline"}><i />{online ? "متصل · البيانات محمّلة" : "أوفلاين · النسخة المحفوظة"}</span>
+          <small>{number.format(totals.assets)} منشأة · الإصدار 3.0</small>
+        </div>
+      </aside>
 
       {showInstallGuide && (
         <div className="install-overlay" role="dialog" aria-modal="true" aria-labelledby="install-title" onClick={(event) => { if (event.target === event.currentTarget) setShowInstallGuide(false); }}>
@@ -668,7 +695,7 @@ export default function Home() {
         </div>
       )}
 
-      <footer><b>إدارات قطاع الري</b><span>مبني على سجل البيانات المرفق دون إضافة بيانات افتراضية.</span><small>الإصدار 2.2</small></footer>
+      <footer><b>إدارات قطاع الري</b><span>مبني على سجل البيانات المرفق دون إضافة بيانات افتراضية.</span><small>الإصدار 3.0</small></footer>
     </main>
   );
 }
