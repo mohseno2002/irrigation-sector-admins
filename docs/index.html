@@ -331,11 +331,29 @@
     .quality-card i { display:block; height:100%; background:linear-gradient(90deg,var(--aqua),var(--blue)); }
     .quality-note { grid-column:1/-1; padding:15px; border-right:4px solid var(--gold); border-radius:10px; color:var(--muted); background:#fff9e9; font-size:10px; }
 
+    .records-module { padding:20px; }
+    .records-toolbar {
+      margin-bottom:14px; padding:16px; display:flex; align-items:center; justify-content:space-between; gap:14px;
+      border:1px solid #c5e5e7; border-radius:16px; background:linear-gradient(135deg,#edfafa,#fff);
+    }
+    .records-heading { display:flex; align-items:center; gap:11px; min-width:0; }
+    .records-heading h3 { margin:0; font-size:18px; }
+    .records-heading p { margin:3px 0 0; color:var(--muted); font-size:9px; }
+    .records-heading strong { min-width:42px; color:var(--blue); font-size:25px; text-align:center; }
+    .records-actions { display:flex; align-items:center; justify-content:flex-end; gap:7px; flex-wrap:wrap; }
+    .search.compact { width:240px; min-height:42px; }
+    .records-table table { min-width:1000px; }
+    .records-empty { min-height:220px; display:grid; place-content:center; gap:5px; text-align:center; border:1px dashed var(--line); border-radius:15px; color:var(--muted); background:#fff; }
+    .records-empty b { color:var(--blue); font-size:14px; }
+    .records-empty span { font-size:10px; }
+    .record-link { color:var(--blue); text-decoration:underline; font-weight:800; }
+    input[readonly] { color:var(--muted); background:#f1f6f7 !important; }
+
     .loading-card { min-height:180px; display:grid; place-items:center; color:var(--muted); }
     .spinner { width:34px; height:34px; margin:0 auto 9px; border:3px solid #d8e8ec; border-top-color:var(--aqua); border-radius:50%; animation:spin .75s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
 
-    dialog { width:min(460px,calc(100% - 28px)); padding:0; border:0; border-radius:20px; color:var(--ink); background:#fff; box-shadow:0 28px 70px rgba(8,51,68,.28); }
+    dialog { width:min(460px,calc(100% - 28px)); max-height:calc(100% - 28px); overflow:auto; overscroll-behavior:contain; padding:0; border:0; border-radius:20px; color:var(--ink); background:#fff; box-shadow:0 28px 70px rgba(8,51,68,.28); }
     dialog::backdrop { background:rgba(8,51,68,.62); }
     .dialog-body { padding:25px; }
     .dialog-body h2 { margin:0; font-size:21px; }
@@ -428,6 +446,10 @@
       .filters input { width:100%; }
       .cards-list { grid-template-columns:1fr; }
       .module { padding:13px; }
+      .records-module { padding:10px; }
+      .records-toolbar { padding:13px; display:block; }
+      .records-actions { margin-top:12px; justify-content:stretch; }
+      .records-actions .search,.records-actions button { width:100%; }
       .module-intro { grid-template-columns:45px 1fr; padding:15px; }
       .module-intro strong { grid-column:1/-1; }
       .quality-grid { grid-template-columns:repeat(2,1fr); padding:13px; gap:8px; }
@@ -551,6 +573,12 @@
           <button class="tab" role="tab" aria-selected="false" data-tab="assets">الكباري والمنشآت</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="covers">التغطيات</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="properties">الأملاك</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="canal_profile">أورنيك الترع</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="license">التراخيص</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="violation">محاضر المخالفات</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="removal_decision">قرارات الإزالة</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="human_resource">الموارد البشرية</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="lined_canal">الترع المبطنة</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="quality">جودة البيانات</button>
         </div>
 
@@ -596,6 +624,13 @@
             </div>
           </div>
         </section>
+
+        <section class="tab-panel" data-panel="canal_profile" hidden><div class="records-module" data-record-module="canal_profile"></div></section>
+        <section class="tab-panel" data-panel="license" hidden><div class="records-module" data-record-module="license"></div></section>
+        <section class="tab-panel" data-panel="violation" hidden><div class="records-module" data-record-module="violation"></div></section>
+        <section class="tab-panel" data-panel="removal_decision" hidden><div class="records-module" data-record-module="removal_decision"></div></section>
+        <section class="tab-panel" data-panel="human_resource" hidden><div class="records-module" data-record-module="human_resource"></div></section>
+        <section class="tab-panel" data-panel="lined_canal" hidden><div class="records-module" data-record-module="lined_canal"></div></section>
 
         <section class="tab-panel" data-panel="quality" hidden>
           <div class="quality-grid" id="qualityGrid"></div>
@@ -664,9 +699,24 @@
     </form>
   </dialog>
 
-  <footer><b>إدارات قطاع الري</b><span>صفحة PWA ثابتة مع مزامنة Google Sheets والعمل دون اتصال.</span><small>الإصدار Sync PWA 2.0</small></footer>
+  <dialog class="dialog-wide" id="recordDialog">
+    <form class="dialog-body" id="recordForm">
+      <h2 id="recordDialogTitle">إضافة سجل</h2>
+      <p>كل سجل مرتبط بالإدارة الحالية، ويُحفظ على الجهاز ثم يتزامن مع Google Sheets وباقي الأجهزة.</p>
+      <div class="form-grid" id="recordFields"></div>
+      <div class="dialog-note" id="recordDialogNote">الحقول المعلّمة بنجمة مطلوبة.</div>
+      <div class="dialog-actions">
+        <button class="danger-button" id="deleteRecord" type="button">حذف مع الاحتفاظ بالمراجعة</button>
+        <button class="secondary-button" id="recordClose" type="button">إلغاء</button>
+        <button class="primary-button" type="submit">حفظ السجل</button>
+      </div>
+    </form>
+  </dialog>
 
-  <script src="./sync-client.js?v=2"></script>
+  <footer><b>إدارات قطاع الري</b><span>منصة قطاعية شاملة مع مزامنة Google Sheets والعمل دون اتصال.</span><small>الإصدار Sector Platform 3.0</small></footer>
+
+  <script src="./sync-client.js?v=3"></script>
+  <script src="./platform-modules.js?v=3"></script>
   <script>
     (() => {
       "use strict";
@@ -681,7 +731,8 @@
         selectedEngineer:"",
         selectedCanal:"",
         installPrompt:null,
-        sync:null
+        sync:null,
+        platform:null
       };
 
       const byId = (id) => document.getElementById(id);
@@ -944,6 +995,7 @@
         renderAssets();
         renderCovers();
         renderQuality();
+        state.platform?.refresh();
       }
 
       function refreshAllViews() {
@@ -953,6 +1005,7 @@
         renderOverview();
         renderAdminGrid(byId("adminSearch").value);
         if (state.selected) renderSelectedWorkspace(false);
+        else state.platform?.refresh();
       }
 
       function selectAdmin(name) {
@@ -1102,6 +1155,10 @@
             if (state.baseAssets.length) refreshAllViews();
           }
         });
+        state.platform = window.IrrigationModules.createPlatform({
+          sync:state.sync,
+          getAdministration:() => state.selected?.name || ""
+        });
         setSyncStatus({
           state:state.sync.isConfigured() ? (navigator.onLine ? "pending" : "offline") : "setup",
           pending:state.sync.pendingCount()
@@ -1210,7 +1267,7 @@
       },60000);
 
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("./sw.js?v=sync-pwa-2",{updateViaCache:"none"}).catch(() => undefined);
+        navigator.serviceWorker.register("./sw.js?v=sector-platform-3",{updateViaCache:"none"}).catch(() => undefined);
       }
 
       initializeSync();

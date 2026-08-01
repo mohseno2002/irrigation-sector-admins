@@ -1,11 +1,11 @@
 {
   "name": "إدارات قطاع الري",
   "short_name": "إدارات الري",
-  "description": "منصة إدارات قطاع الري وهندساتها وترعها ومنشآتها المائية",
+  "description": "منصة قطاعية شاملة لإدارة الترع والمنشآت والتراخيص والمخالفات والموارد البشرية",
   "lang": "ar",
   "dir": "rtl",
   "id": "./",
-  "start_url": "./?source=sync-pwa-2",
+  "start_url": "./?source=sector-platform-3",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",

@@ -44,12 +44,17 @@
     return "asset-" + fnv1a64(identity);
   }
 
+  function cleanEntityType(value) {
+    const entityType = String(value || "asset").trim();
+    return /^[a-z][a-z0-9_]{0,39}$/.test(entityType) ? entityType : "asset";
+  }
+
   function normalizeChange(change) {
     return {
       changeId: String(change.changeId || ""),
       recordId: String(change.recordId || ""),
       operation: change.operation === "delete" ? "delete" : "upsert",
-      entityType: "asset",
+      entityType: cleanEntityType(change.entityType),
       payload: change.payload && typeof change.payload === "object" ? change.payload : {},
       baseVersion: Number(change.baseVersion) || 0,
       version: Number(change.version) || 0,
@@ -107,8 +112,11 @@
       return read(KEYS.remote, {});
     }
 
-    function getPending() {
-      return read(KEYS.pending, []).map(normalizeChange);
+    function getPending(entityType) {
+      const changes = read(KEYS.pending, []).map(normalizeChange);
+      if (!entityType) return changes;
+      const cleanType = cleanEntityType(entityType);
+      return changes.filter((change) => change.entityType === cleanType);
     }
 
     function getConflicts() {
@@ -119,12 +127,13 @@
       return getPending().length;
     }
 
-    function applyOverlay(baseAssets) {
+    function applyOverlay(baseAssets, entityType) {
+      const cleanType = cleanEntityType(entityType || "asset");
       const records = new Map(baseAssets.map((asset) => [asset.recordId, Object.assign({}, asset)]));
       const orderedChanges = [
         ...Object.values(getRemoteMap()).map(normalizeChange),
         ...getPending(),
-      ];
+      ].filter((change) => change.entityType === cleanType);
       for (const change of orderedChanges) {
         if (!change.recordId) continue;
         if (change.deleted) {
@@ -134,24 +143,33 @@
         const previous = records.get(change.recordId) || {};
         records.set(change.recordId, Object.assign({}, previous, change.payload, {
           recordId: change.recordId,
+          entityType: cleanType,
           version: change.version || previous.version || 0,
+          updatedAt: change.updatedAt || previous.updatedAt || "",
+          updatedBy: change.updatedBy || previous.updatedBy || "",
           locallyPending: !change.version,
         }));
       }
       return [...records.values()];
     }
 
-    function queue(operation, asset) {
+    function getRecords(entityType) {
+      return applyOverlay([], entityType);
+    }
+
+    function queue(operation, asset, entityType) {
       const config = getConfig();
       const remote = getRemoteMap();
       const pending = getPending();
-      const recordId = asset.recordId || makeId("asset");
+      const cleanType = cleanEntityType(entityType || asset.entityType || "asset");
+      const recordId = asset.recordId || makeId(cleanType);
       const priorPending = pending.find((item) => item.recordId === recordId);
       const change = normalizeChange({
         changeId: priorPending ? priorPending.changeId : makeId("change"),
         recordId,
         operation,
-        payload: Object.assign({}, asset, { recordId }),
+        entityType: cleanType,
+        payload: Object.assign({}, asset, { recordId, entityType: cleanType }),
         baseVersion: priorPending ? priorPending.baseVersion : Number(remote[recordId]?.version) || Number(asset.version) || 0,
         updatedAt: new Date().toISOString(),
         updatedBy: config.user || "مستخدم محلي",
@@ -166,12 +184,12 @@
       return change;
     }
 
-    function queueUpsert(asset) {
-      return queue("upsert", asset);
+    function queueUpsert(asset, entityType) {
+      return queue("upsert", asset, entityType);
     }
 
-    function queueDelete(asset) {
-      return queue("delete", asset);
+    function queueDelete(asset, entityType) {
+      return queue("delete", asset, entityType);
     }
 
     async function request(payload, timeoutMs) {
@@ -267,7 +285,7 @@
     return {
       deviceId,
       stableRecordId,
-      makeRecordId: () => makeId("asset"),
+      makeRecordId: (entityType) => makeId(cleanEntityType(entityType)),
       getConfig,
       saveConfig,
       isConfigured,
@@ -275,6 +293,7 @@
       getConflicts,
       pendingCount,
       applyOverlay,
+      getRecords,
       queueUpsert,
       queueDelete,
       clearConflicts,
