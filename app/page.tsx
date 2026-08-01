@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type RawData = {
   generatedFrom: string;
@@ -45,6 +45,8 @@ type AdminSummary = {
 };
 
 type WorkspaceTab = "structure" | "assets" | "coverages" | "properties" | "quality";
+
+type FocusLevel = "engineers" | "canals" | "assets";
 
 type InstallPromptEvent = Event & {
   prompt: () => Promise<void>;
@@ -132,6 +134,9 @@ export default function Home() {
   const [query, setQuery] = useState("");
   const [selected, setSelected] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<WorkspaceTab>("structure");
+  const [focusLevel, setFocusLevel] = useState<FocusLevel>("engineers");
+  const [focusTick, setFocusTick] = useState(0);
+  const focusRequest = useRef(0);
   const [selectedEngineer, setSelectedEngineer] = useState<string | null>(null);
   const [selectedCanal, setSelectedCanal] = useState<string | null>(null);
   const [assetQuery, setAssetQuery] = useState("");
@@ -178,14 +183,20 @@ export default function Home() {
 
   useEffect(() => {
     if (!selected) return;
+    const target =
+      focusLevel === "canals"
+        ? ".canal-panel"
+        : focusLevel === "assets"
+          ? ".assets-panel"
+          : null;
     const timer = window.setTimeout(() => {
-      document.getElementById("admin-workspace")?.scrollIntoView({
-        behavior: "auto",
-        block: "start",
-      });
-    }, 80);
+      const node = target
+        ? document.querySelector<HTMLElement>(target)
+        : document.getElementById("admin-workspace");
+      node?.scrollIntoView({ behavior: "auto", block: "start" });
+    }, 90);
     return () => window.clearTimeout(timer);
-  }, [selected]);
+  }, [selected, focusLevel, focusTick]);
 
   const summaries = useMemo(() => makeSummaries(assets), [assets]);
   const filtered = useMemo(() => {
@@ -219,19 +230,24 @@ export default function Home() {
 
   const globalReadiness = useMemo(() => getReadiness(assets), [assets]);
 
-  const openAdmin = (name: string) => {
+  const openAdmin = (name: string, focus: FocusLevel = "engineers") => {
     setSelected(name);
-    setActiveTab("structure");
+    setActiveTab(focus === "assets" ? "assets" : "structure");
     setSelectedEngineer(null);
     setSelectedCanal(null);
     setAssetQuery("");
     setCategory("الكل");
+    setFocusLevel(focus);
+    focusRequest.current += 1;
+    setFocusTick(focusRequest.current);
   };
 
   const selectWorkspaceTab = (nextTab: WorkspaceTab) => {
     if (nextTab === activeTab) return;
 
-    const currentScrollY = window.scrollY;
+    // لا نلمس تمرير الصفحة العمودي هنا إطلاقًا: أي window.scrollTo بعد تبديل
+    // التبويب يتصارع مع تصحيح المتصفح لارتفاع المستند فينتج اهتزاز متكرر على
+    // الموبايل. نكتفي بالحفاظ على موضع شريط التبويبات الأفقي فقط.
     const tabStrip = document.querySelector<HTMLElement>(".workspace-tabs");
     const currentTabScroll = tabStrip?.scrollLeft ?? 0;
 
@@ -239,9 +255,6 @@ export default function Home() {
 
     window.requestAnimationFrame(() => {
       if (tabStrip) tabStrip.scrollLeft = currentTabScroll;
-      if (window.innerWidth <= 640 && Math.abs(window.scrollY - currentScrollY) > 1) {
-        window.scrollTo({ top: currentScrollY, left: 0, behavior: "auto" });
-      }
     });
   };
 
@@ -340,9 +353,9 @@ export default function Home() {
           <a className="active" href="#top">الرئيسية</a>
           <a href="#sector-dashboard">لوحة القطاع</a>
           <a href="#administrations">الإدارات</a>
-          <a href="#administrations">الهندسات</a>
-          <a href="#administrations">الترع</a>
-          <a href="#administrations">المنشآت</a>
+          <a href="#admin-workspace">الهندسات</a>
+          <a href="#admin-workspace">الترع</a>
+          <a href="#admin-workspace">المنشآت</a>
         </nav>
         <div className="top-actions">
           <span className={`source-status ${online ? "" : "offline"}`}><i /> {online ? "متصل · البيانات محمّلة" : "أوفلاين · النسخة المحفوظة"}</span>
@@ -450,20 +463,20 @@ export default function Home() {
           <div className="admin-grid">
             {!data && Array.from({ length: 6 }).map((_, index) => <div className="admin-card skeleton" key={index} />)}
             {filtered.map((admin, index) => (
-              <button className="admin-card" key={admin.name} onClick={() => openAdmin(admin.name)} style={{ "--delay": `${Math.min(index, 10) * 35}ms` } as React.CSSProperties}>
-                <div className="admin-card-head">
+              <article className="admin-card" key={admin.name} style={{ "--delay": `${Math.min(index, 10) * 35}ms` } as React.CSSProperties}>
+                <button type="button" className="admin-card-head" onClick={() => openAdmin(admin.name, "engineers")}>
                   <span className="admin-icon">{String(index + 1).padStart(2, "0")}</span>
                   <div><small>{admin.governorates.join(" · ")}</small><h3>{admin.name}</h3></div>
                   <span className="arrow">↙</span>
-                </div>
+                </button>
                 <div className="admin-stats">
-                  <span><b>{number.format(admin.engineers)}</b> هندسة</span>
-                  <span><b>{number.format(admin.canals)}</b> ترعة</span>
-                  <span><b>{number.format(admin.assets.length)}</b> منشأة</span>
+                  <button type="button" aria-label={`عرض أسماء الهندسات التابعة لـ${admin.name}`} onClick={() => openAdmin(admin.name, "engineers")}><b>{number.format(admin.engineers)}</b> هندسة</button>
+                  <button type="button" aria-label={`عرض أسماء الترع التابعة لـ${admin.name}`} onClick={() => openAdmin(admin.name, "canals")}><b>{number.format(admin.canals)}</b> ترعة</button>
+                  <button type="button" aria-label={`عرض منشآت ${admin.name}`} onClick={() => openAdmin(admin.name, "assets")}><b>{number.format(admin.assets.length)}</b> منشأة</button>
                 </div>
-                <div className="admin-modules"><span>الكباري</span><span className="pending">التغطيات</span><span className="pending">الأملاك</span></div>
-                <div className="card-foot"><span>جاهزية البيانات {number.format(admin.readiness)}٪</span><i><b style={{ width: `${admin.readiness}%` }} /></i></div>
-              </button>
+                <div className="admin-modules"><button type="button" onClick={() => openAdmin(admin.name, "assets")}>الكباري</button><span className="pending">التغطيات</span><span className="pending">الأملاك</span></div>
+                <div className="card-foot"><span>اضغط أي رقم بالأعلى لعرض أسمائه · جاهزية البيانات {number.format(admin.readiness)}٪</span><i><b style={{ width: `${admin.readiness}%` }} /></i></div>
+              </article>
             ))}
           </div>
           {!filtered.length && data && <div className="empty-state">لا توجد إدارة مطابقة لعبارة البحث.</div>}
@@ -528,8 +541,8 @@ export default function Home() {
             <div className="workspace-content-shell">
             {(activeTab === "structure" || activeTab === "assets") && (
               <div className="asset-browser">
-                <aside className="engineer-panel">
-                  <div className="panel-title"><div><span>المستوى الأول</span><h3>الهندسات التابعة</h3></div><b>{number.format(engineers.length)}</b></div>
+                <aside className={focusLevel === "engineers" ? "engineer-panel focused" : "engineer-panel"}>
+                  <div className="panel-title"><div><span>المستوى الأول</span><h3>أسماء الهندسات التابعة</h3></div><b>{number.format(engineers.length)}</b></div>
                   <button className={!selectedEngineer ? "selected" : ""} onClick={() => { setSelectedEngineer(null); setSelectedCanal(null); }}>
                     <span><b>كل الهندسات</b><small>عرض كامل نطاق الإدارة</small></span><strong>{number.format(selectedSummary.assets.length)}</strong>
                   </button>
@@ -542,8 +555,8 @@ export default function Home() {
                   </div>
                 </aside>
 
-                <aside className="canal-panel">
-                  <div className="panel-title"><div><span>المستوى الثاني</span><h3>الترع والمجاري</h3></div><b>{number.format(canals.length)}</b></div>
+                <aside className={focusLevel === "canals" ? "canal-panel focused" : "canal-panel"}>
+                  <div className="panel-title"><div><span>المستوى الثاني</span><h3>أسماء الترع والمجاري</h3></div><b>{number.format(canals.length)}</b></div>
                   <button className={!selectedCanal ? "selected" : ""} onClick={() => setSelectedCanal(null)}>
                     <span><b>كل الترع</b><small>{selectedEngineer || selectedSummary.name}</small></span><strong>{number.format(engineerAssets.length)}</strong>
                   </button>
@@ -655,7 +668,7 @@ export default function Home() {
         </div>
       )}
 
-      <footer><b>إدارات قطاع الري</b><span>مبني على سجل البيانات المرفق دون إضافة بيانات افتراضية.</span><small>الإصدار 2.0</small></footer>
+      <footer><b>إدارات قطاع الري</b><span>مبني على سجل البيانات المرفق دون إضافة بيانات افتراضية.</span><small>الإصدار 2.2</small></footer>
     </main>
   );
 }

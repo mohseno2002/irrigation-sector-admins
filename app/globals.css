@@ -23,7 +23,7 @@ body { margin: 0; background: var(--paper); color: var(--ink); font-family: "IBM
 button, input, select { font: inherit; }
 button, a { -webkit-tap-highlight-color: transparent; }
 a { color: inherit; text-decoration: none; }
-main { min-height: 100vh; overflow: hidden; background: radial-gradient(circle at 0 2%, rgba(24,166,166,.09), transparent 21%), linear-gradient(180deg, #fbfdfe 0, var(--paper) 760px); }
+main { min-height: 100vh; overflow-x: clip; background: radial-gradient(circle at 0 2%, rgba(24,166,166,.09), transparent 21%), linear-gradient(180deg, #fbfdfe 0, var(--paper) 760px); }
 
 .topbar { height: 78px; padding: 0 clamp(18px, 4vw, 64px); display: flex; align-items: center; gap: 38px; border-bottom: 1px solid rgba(213,230,237,.9); background: rgba(255,255,255,.88); backdrop-filter: blur(18px); position: sticky; top: 0; z-index: 50; }
 .brand { display: flex; align-items: center; gap: 11px; min-width: 235px; }
@@ -125,19 +125,24 @@ main { min-height: 100vh; overflow: hidden; background: radial-gradient(circle a
 .search-box span { font-size: 20px; color: var(--blue); }
 .search-box input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--ink); font-size: 12px; }
 .admin-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
-.admin-card { --delay: 0ms; text-align: right; padding: 20px; border: 1px solid var(--line); border-radius: 20px; color: var(--ink); background: rgba(255,255,255,.94); box-shadow: 0 8px 26px rgba(7,59,92,.055); cursor: pointer; animation: cardIn .48s both; animation-delay: var(--delay); transition: transform .2s, border-color .2s, box-shadow .2s; }
+.admin-card { --delay: 0ms; text-align: right; padding: 20px; border: 1px solid var(--line); border-radius: 20px; color: var(--ink); background: rgba(255,255,255,.94); box-shadow: 0 8px 26px rgba(7,59,92,.055); animation: cardIn .48s both; animation-delay: var(--delay); transition: transform .2s, border-color .2s, box-shadow .2s; }
 .admin-card:hover { transform: translateY(-4px); border-color: #a7ced8; box-shadow: 0 18px 36px rgba(7,59,92,.1); }
-.admin-card-head { display: grid; grid-template-columns: 45px 1fr auto; align-items: center; gap: 11px; }
+.admin-card-head { width: 100%; padding: 0; display: grid; grid-template-columns: 45px 1fr auto; align-items: center; gap: 11px; text-align: right; color: inherit; background: transparent; border: 0; cursor: pointer; }
 .admin-icon { width: 45px; height: 45px; display: grid; place-items: center; border: 1px solid #cbe6eb; border-radius: 14px; color: var(--blue); background: linear-gradient(145deg, #f7fcfd, var(--aqua-soft)); font-size: 11px; font-weight: 800; }
 .admin-card-head small { color: var(--muted); font-size: 8.5px; }
 .admin-card h3 { margin: 2px 0 0; font-size: 15px; }
 .arrow { color: var(--aqua); font-size: 20px; }
 .admin-stats { display: grid; grid-template-columns: repeat(3, 1fr); margin: 18px 0 14px; border: 1px solid #e7f0f3; border-radius: 12px; overflow: hidden; }
-.admin-stats span { padding: 9px 6px; text-align: center; color: var(--muted); font-size: 8.5px; border-left: 1px solid #e7f0f3; }
-.admin-stats span:last-child { border: 0; }
+.admin-stats span, .admin-stats button { width: 100%; padding: 9px 6px; text-align: center; color: var(--muted); font-size: 8.5px; border: 0; border-left: 1px solid #e7f0f3; background: transparent; }
+.admin-stats button { cursor: pointer; transition: background .18s, color .18s; }
+.admin-stats button:hover, .admin-stats button:focus-visible { color: var(--blue); background: #eaf7f9; outline: 0; }
+.admin-stats button:active { background: #d9edf2; }
+.admin-stats span:last-child, .admin-stats button:last-child { border-left: 0; }
 .admin-stats b { display: block; color: var(--ink); font-size: 13px; margin-bottom: 2px; }
 .admin-modules { display: flex; gap: 6px; }
-.admin-modules span { flex: 1; padding: 6px 7px; text-align: center; color: var(--blue); background: #eef8fa; border: 1px solid #d3eaee; border-radius: 9px; font-size: 8.5px; font-weight: 700; }
+.admin-modules span, .admin-modules button { flex: 1; padding: 6px 7px; text-align: center; color: var(--blue); background: #eef8fa; border: 1px solid #d3eaee; border-radius: 9px; font-size: 8.5px; font-weight: 700; }
+.admin-modules button { cursor: pointer; }
+.admin-modules button:hover, .admin-modules button:focus-visible { background: #dcf1f5; border-color: #a9d8e1; outline: 0; }
 .admin-modules span.pending { color: #7f8e94; background: #f6f8f8; border-style: dashed; }
 .card-foot { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 11px; margin-top: 13px; color: var(--muted); font-size: 8.5px; }
 .card-foot > i { height: 4px; background: var(--paper-2); border-radius: 4px; overflow: hidden; }
@@ -187,6 +192,7 @@ main { min-height: 100vh; overflow: hidden; background: radial-gradient(circle a
 .engineer-panel button b, .canal-panel button b { display: block; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 9.5px; }
 .engineer-panel button small, .canal-panel button small { display: block; max-width: 155px; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--muted); font-size: 7.5px; }
 .engineer-panel button strong, .canal-panel button strong { color: var(--blue); font-size: 9px; }
+.engineer-panel.focused, .canal-panel.focused { box-shadow: inset 0 0 0 2px #8fd2d6; }
 .scroll-list { max-height: 540px; padding-left: 3px; overflow: auto; scrollbar-width: thin; scrollbar-color: #bdd6dd transparent; }
 
 .assets-panel { padding: 18px; min-width: 0; }
@@ -274,14 +280,16 @@ footer small { margin-inline-start: auto; }
   .source-panel { grid-column: 1/-1; min-height: 270px; }
   .admin-grid { grid-template-columns: repeat(2, 1fr); }
   .admin-workspace { margin-inline: 20px; }
-  .asset-browser { grid-template-columns: 210px minmax(0, 1fr); }
-  .canal-panel { display: none; }
+  .asset-browser { display: block; }
+  .engineer-panel, .canal-panel { display: block; border: 0; border-bottom: 1px solid var(--line); }
+  .engineer-panel .scroll-list, .canal-panel .scroll-list { display: flex; max-height: none; overflow-x: auto; }
+  .engineer-panel button, .canal-panel button { min-width: 180px; margin-left: 6px; }
   .quality-view { grid-template-columns: repeat(2, 1fr); }
 }
 
 @media (max-width: 640px) {
-  html { scroll-behavior: auto; overflow-x: hidden; }
-  body { overflow-x: hidden; overscroll-behavior-x: none; }
+  html { scroll-behavior: auto; }
+  body { overflow-x: clip; overscroll-behavior-x: none; overflow-anchor: none; }
   .topbar { height: 68px; padding: 0 14px; gap: 8px; }
   .topbar { background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; }
   .brand { min-width: 0; margin-inline-end: auto; }
@@ -327,16 +335,17 @@ footer small { margin-inline-start: auto; }
   .workspace-actions { margin-top: 17px; }
   .workspace-metrics { grid-template-columns: repeat(2, 1fr); }
   .workspace-metrics article { min-height: 78px; padding: 12px; border-bottom: 1px solid var(--line); }
-  .workspace-tabs { padding: 9px; scroll-behavior: auto; overscroll-behavior-x: contain; scrollbar-width: none; touch-action: pan-x; overflow-anchor: none; }
+  .workspace-tabs { padding: 9px; scroll-behavior: auto; overscroll-behavior-x: contain; scrollbar-width: none; touch-action: pan-x pan-y; overflow-anchor: none; }
   .workspace-tabs::-webkit-scrollbar { display: none; }
   .workspace-tabs button { flex: 0 0 auto; transform: none; }
-  .workspace-content-shell { min-height: 660px; overflow-anchor: none; contain: layout; }
+  .workspace-content-shell { min-height: 660px; overflow-anchor: none; contain: layout; scroll-margin-top: 80px; }
   .asset-browser { display: block; }
   .asset-browser, .module-view, .quality-view { min-height: 660px; }
-  .engineer-panel, .canal-panel { border: 0; border-bottom: 1px solid var(--line); }
-  .engineer-panel { display: block; }
-  .engineer-panel .scroll-list { display: flex; max-height: none; overflow-x: auto; }
-  .engineer-panel button { min-width: 180px; margin-left: 6px; }
+  .engineer-panel, .canal-panel { display: block; border: 0; border-bottom: 1px solid var(--line); }
+  .engineer-panel .scroll-list, .canal-panel .scroll-list { display: flex; max-height: none; overflow-x: auto; }
+  .engineer-panel button, .canal-panel button { min-width: 180px; margin-left: 6px; }
+  .engineer-panel button b, .canal-panel button b { max-width: 128px; }
+  .admin-stats button { min-height: 46px; }
   .assets-panel { padding: 13px; }
   .assets-panel-head { display: block; }
   .asset-filters { margin-top: 10px; }
