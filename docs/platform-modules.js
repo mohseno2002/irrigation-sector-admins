@@ -11,6 +11,33 @@
   };
 
   const MODULES = {
+    property: {
+      title: "الأملاك",
+      singular: "سجل ملكية",
+      icon: "◇",
+      description: "الأراضي والمباني والمنافع العامة والموقف القانوني والتعديات المرتبطة بها.",
+      keyField: "propertyNumber",
+      columns: ["propertyNumber", "propertyType", "locationDescription", "areaSqm", "legalStatus", "encroachmentStatus"],
+      fields: [
+        { key: "propertyNumber", label: "رقم سجل الملكية *", type: "text", required: true, maxLength: 120 },
+        { key: "propertyType", label: "نوع الأصل *", type: "select", required: true, options: ["أرض", "مبنى إداري", "استراحة", "مخزن", "ورشة", "منفعة عامة", "حرم ترعة", "أخرى"] },
+        common.eng,
+        common.canal,
+        { key: "locationDescription", label: "وصف الموقع *", type: "textarea", required: true, maxLength: 700, full: true },
+        { key: "areaSqm", label: "المساحة (م²)", type: "number", min: 0, max: 1000000000, step: "any" },
+        { key: "areaFeddan", label: "المساحة (فدان)", type: "number", min: 0, max: 10000000, step: "any" },
+        { key: "deedNumber", label: "رقم سند الملكية أو التخصيص", type: "text", maxLength: 160 },
+        { key: "currentUse", label: "الاستخدام الحالي", type: "text", maxLength: 240 },
+        { key: "occupant", label: "الشاغل أو المنتفع", type: "text", maxLength: 240 },
+        { key: "legalStatus", label: "الموقف القانوني", type: "select", options: ["ملكية مثبتة", "تخصيص", "انتفاع", "جارٍ التسجيل", "نزاع", "غير محدد"] },
+        { key: "encroachmentStatus", label: "موقف التعدي", type: "select", options: ["لا يوجد", "تعدٍ قائم", "تم تحرير محضر", "صدر قرار إزالة", "تمت الإزالة", "قيد المتابعة"] },
+        { key: "estimatedValue", label: "القيمة التقديرية (جنيه)", type: "number", min: 0, max: 1000000000000, step: "any" },
+        { key: "latitude", label: "دائرة العرض", type: "number", min: -90, max: 90, step: "any" },
+        { key: "longitude", label: "خط الطول", type: "number", min: -180, max: 180, step: "any" },
+        common.documentUrl,
+        common.notes,
+      ],
+    },
     canal_profile: {
       title: "أورنيك الترع",
       singular: "أورنيك ترعة",
@@ -257,6 +284,7 @@
   function createPlatform(options) {
     const sync = options.sync;
     const getAdministration = options.getAdministration;
+    const getBaseRecords = typeof options.getBaseRecords === "function" ? options.getBaseRecords : () => [];
     const roots = [...root.document.querySelectorAll("[data-record-module]")];
     const dialog = root.document.getElementById("recordDialog");
     const form = root.document.getElementById("recordForm");
@@ -268,9 +296,13 @@
     let activeId = "";
     const searches = {};
 
+    function allRecordsFor(type) {
+      return sync.applyOverlay(getBaseRecords(type) || [], type);
+    }
+
     function recordsFor(type) {
       const adm = getAdministration();
-      return sync.getRecords(type)
+      return allRecordsFor(type)
         .filter((record) => record.adm === adm)
         .sort((a, b) => String(b.updatedAt || b.recordId).localeCompare(String(a.updatedAt || a.recordId)));
     }
@@ -292,7 +324,12 @@
             ? '<a class="record-link" href="' + escapeHtml(record[key]) + '" target="_blank" rel="noopener">فتح المستند</a>'
             : escapeHtml(value)) + '</td>';
         }).join("");
-        return '<tr>' + cells + '<td><div class="row-actions"><button class="row-action" type="button" data-module-edit="' + escapeHtml(record.recordId) + '" data-module-type="' + type + '">تعديل</button>' + (record.locallyPending ? '<span class="tag">بانتظار المزامنة</span>' : '') + '</div></td></tr>';
+        const sourceBadge = record.locallyPending
+          ? '<span class="tag">بانتظار المزامنة</span>'
+          : record.version
+            ? '<span class="tag">سجل مركزي</span>'
+            : '<span class="tag">سجل أساسي رقمي</span>';
+        return '<tr>' + cells + '<td><div class="row-actions"><button class="row-action" type="button" data-module-edit="' + escapeHtml(record.recordId) + '" data-module-type="' + type + '">تعديل</button>' + sourceBadge + '</div></td></tr>';
       }).join("");
       element.innerHTML =
         '<div class="records-toolbar"><div class="records-heading"><span class="module-icon">' + definition.icon + '</span><div><h3>' + escapeHtml(definition.title) + '</h3><p>' + escapeHtml(adm ? definition.description : "اختر إدارة أولًا") + '</p></div><strong>' + number.format(allRecords.length) + '</strong></div>' +
@@ -309,7 +346,7 @@
     function openEditor(type, recordId) {
       const definition = MODULES[type];
       if (!definition) return;
-      const existing = recordId ? sync.getRecords(type).find((record) => record.recordId === recordId) : null;
+      const existing = recordId ? allRecordsFor(type).find((record) => record.recordId === recordId) : null;
       const adm = getAdministration();
       if (!adm) return;
       activeType = type;
@@ -323,7 +360,7 @@
     }
 
     function formRecord() {
-      const existing = sync.getRecords(activeType).find((record) => record.recordId === activeId);
+      const existing = allRecordsFor(activeType).find((record) => record.recordId === activeId);
       const data = Object.fromEntries(new FormData(form).entries());
       return sanitizeRecord(activeType, Object.assign({}, existing || {}, data, {
         recordId: activeId,
@@ -380,7 +417,7 @@
     });
     deleteButton.addEventListener("click", () => {
       const definition = MODULES[activeType];
-      const record = sync.getRecords(activeType).find((item) => item.recordId === activeId);
+      const record = allRecordsFor(activeType).find((item) => item.recordId === activeId);
       if (!record || !root.confirm("سيُحذف سجل «" + (record[definition.keyField] || definition.singular) + "» من جميع الأجهزة. هل تريد المتابعة؟")) return;
       sync.queueDelete(record, activeType);
       dialog.close();
@@ -389,7 +426,7 @@
     });
 
     refresh();
-    return { refresh, openEditor, recordsFor };
+    return { refresh, openEditor, recordsFor, allRecordsFor };
   }
 
   root.IrrigationModules = { MODULES, sanitizeRecord, createPlatform };

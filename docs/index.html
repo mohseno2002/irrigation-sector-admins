@@ -159,6 +159,21 @@
     .metric strong,.metric span { display:block; }
     .metric strong { font-size:27px; line-height:1.1; }
     .metric span { margin-top:5px; color:var(--muted); font-size:10px; }
+    .digitization-strip {
+      max-width:1360px; margin:16px auto 0; padding:0 clamp(14px,4vw,54px);
+      display:grid; grid-template-columns:1.4fr repeat(4,1fr); gap:1px;
+    }
+    .digitization-strip article {
+      min-height:86px; padding:15px 17px; display:grid; align-content:center;
+      border:1px solid var(--line); background:#fff;
+    }
+    .digitization-strip article:first-child { border-radius:18px 0 0 18px; background:linear-gradient(135deg,var(--navy),var(--blue)); color:#fff; }
+    .digitization-strip article:last-child { border-radius:0 18px 18px 0; }
+    .digitization-strip b,.digitization-strip strong,.digitization-strip span { display:block; }
+    .digitization-strip b { font-size:12px; }
+    .digitization-strip strong { color:var(--blue); font-size:22px; }
+    .digitization-strip span { margin-top:3px; color:var(--muted); font-size:9px; }
+    .digitization-strip article:first-child span { color:#cce7eb; }
 
     .section {
       max-width:1360px; margin:0 auto; padding:78px clamp(14px,4vw,54px) 0;
@@ -424,6 +439,9 @@
       .section-head .status,.admin-tools { margin-top:13px; }
       .status-group { justify-content:flex-start; }
       .overview-grid,.admin-grid { grid-template-columns:1fr; }
+      .digitization-strip { grid-template-columns:1fr 1fr; padding:0 12px; }
+      .digitization-strip article,.digitization-strip article:first-child,.digitization-strip article:last-child { border-radius:12px; }
+      .digitization-strip article:first-child { grid-column:1/-1; }
       .panel { padding:16px; border-radius:16px; }
       .bar-row { grid-template-columns:86px 1fr 40px; }
       .admin-tools,.search { width:100%; }
@@ -520,6 +538,14 @@
       <article class="metric"><span class="metric-icon">▰</span><div><strong id="metricAssets">—</strong><span>سجل منشأة فريد</span></div></article>
     </section>
 
+    <section class="digitization-strip" aria-label="موقف رقمنة البيانات">
+      <article><b>رقمنة شاملة للسجل</b><span>كل سجل قائم أو جديد له معرّف ثابت ومسار تحديث ومراجعة.</span></article>
+      <article><strong id="digitizedAssets">—</strong><span>منشأة قائمة مرقمنة</span></article>
+      <article><strong id="digitizedCanals">—</strong><span>ترعة قائمة بأورنيك رقمي</span></article>
+      <article><strong id="centralRecords">—</strong><span>سجل مركزي مضاف أو محدّث</span></article>
+      <article><strong id="pendingRecords">—</strong><span>تعديل ينتظر المزامنة</span></article>
+    </section>
+
     <section class="section" id="overview">
       <div class="section-head">
         <div><span class="eyebrow">الموقف القطاعي</span><h2>قراءة تنفيذية من مصدر واحد</h2><p>مؤشرات محسوبة مباشرة من السجل المرفق بعد إزالة التكرارات المطابقة.</p></div>
@@ -572,7 +598,7 @@
           <button class="tab" role="tab" aria-selected="true" data-tab="structure">الهيكل الإداري</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="assets">الكباري والمنشآت</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="covers">التغطيات</button>
-          <button class="tab" role="tab" aria-selected="false" data-tab="properties">الأملاك</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="property">الأملاك</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="canal_profile">أورنيك الترع</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="license">التراخيص</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="violation">محاضر المخالفات</button>
@@ -613,17 +639,7 @@
           </div>
         </section>
 
-        <section class="tab-panel" data-panel="properties" hidden>
-          <div class="module">
-            <div class="module-intro gold"><span class="module-icon">◇</span><div><h3>سجل الأملاك</h3><p>وحدة جاهزة للربط عند توفير بيانات الملكيات والحيازات والتعديات.</p></div><strong>—</strong></div>
-            <div class="source-gap"><b>فجوة مصدر معلنة</b>الملف المرفق لا يحتوي على بيانات أملاك أو حدود قطع أو حالات تعدٍّ؛ لذلك لا يعرض التطبيق أرقامًا افتراضية. يمكن إضافة الوحدة فور توافر مصدر رسمي.</div>
-            <div class="cards-list">
-              <article class="small-card"><b>بيانات القطعة</b><span>المساحة · الحدود · الإحداثيات</span><small>مطلوب مصدر رسمي</small></article>
-              <article class="small-card"><b>الموقف القانوني</b><span>ملكية · انتفاع · تعدٍ</span><small>مطلوب مصدر رسمي</small></article>
-              <article class="small-card"><b>المتابعة الميدانية</b><span>محضر · إجراء · تاريخ</span><small>مطلوب مصدر رسمي</small></article>
-            </div>
-          </div>
-        </section>
+        <section class="tab-panel" data-panel="property" hidden><div class="records-module" data-record-module="property"></div></section>
 
         <section class="tab-panel" data-panel="canal_profile" hidden><div class="records-module" data-record-module="canal_profile"></div></section>
         <section class="tab-panel" data-panel="license" hidden><div class="records-module" data-record-module="license"></div></section>
@@ -713,10 +729,10 @@
     </form>
   </dialog>
 
-  <footer><b>إدارات قطاع الري</b><span>منصة قطاعية شاملة مع مزامنة Google Sheets والعمل دون اتصال.</span><small>الإصدار Sector Platform 3.0</small></footer>
+  <footer><b>إدارات قطاع الري</b><span>منصة قطاعية شاملة مع مزامنة Google Sheets والعمل دون اتصال.</span><small>الإصدار Sector Platform 4.0 · رقمنة شاملة</small></footer>
 
-  <script src="./sync-client.js?v=3"></script>
-  <script src="./platform-modules.js?v=3"></script>
+  <script src="./sync-client.js?v=4"></script>
+  <script src="./platform-modules.js?v=4"></script>
   <script>
     (() => {
       "use strict";
@@ -725,6 +741,7 @@
       const state = {
         data:null,
         baseAssets:[],
+        baseModuleRecords:{},
         assets:[],
         summaries:[],
         selected:null,
@@ -763,9 +780,56 @@
             lat:row[12] === -1 ? null : row[12],
             version:0
           };
+          asset.recordSource = "السجل الأساسي الرقمي";
           asset.recordId = window.IrrigationSync.stableRecordId(asset);
           return asset;
         });
+      }
+
+      function makeBaseCanalProfiles(items) {
+        const profiles = new Map();
+        for (const asset of items) {
+          if (!asset.canal || asset.canal === "غير محدد") continue;
+          const identity = [asset.adm, asset.eng, asset.canal];
+          const recordId = window.IrrigationSync.stableEntityRecordId("canal_profile", identity);
+          if (profiles.has(recordId)) continue;
+          profiles.set(recordId, {
+            recordId,
+            entityType:"canal_profile",
+            adm:asset.adm,
+            eng:asset.eng,
+            canalName:asset.canal,
+            canalCode:"",
+            canalClass:"",
+            sourceCanal:"",
+            startKm:null,
+            endKm:null,
+            lengthKm:null,
+            designDischarge:null,
+            currentDischarge:null,
+            bedWidthDesign:null,
+            bedWidthCurrent:null,
+            bedLevelStart:null,
+            bedLevelEnd:null,
+            waterLevelUpstream:null,
+            waterLevelDownstream:null,
+            bankLevelRight:null,
+            bankLevelLeft:null,
+            commandAreaFeddan:null,
+            servedVillages:"",
+            liningStatus:"",
+            linedLengthKm:null,
+            operationalStatus:"",
+            lastDredgingDate:"",
+            maintenancePriority:"",
+            latitude:null,
+            longitude:null,
+            notes:"",
+            recordSource:"السجل الأساسي الرقمي",
+            version:0
+          });
+        }
+        return [...profiles.values()];
       }
 
       function readiness(items) {
@@ -842,6 +906,11 @@
         byId("metricCanals").textContent = number.format(canals);
         byId("metricAssets").textContent = number.format(assets.length);
         byId("heroGeocoded").textContent = number.format(geocoded);
+        const baseCanals = state.baseModuleRecords.canal_profile || [];
+        byId("digitizedAssets").textContent = number.format(state.baseAssets.length);
+        byId("digitizedCanals").textContent = number.format(baseCanals.length);
+        byId("centralRecords").textContent = number.format(state.sync ? state.sync.remoteCount() : 0);
+        byId("pendingRecords").textContent = number.format(state.sync ? state.sync.pendingCount() : 0);
       }
 
       function renderOverview() {
@@ -897,7 +966,7 @@
             '<td class="numeric">' + (item.km ?? "—") + '</td>' +
             '<td class="numeric">' + (item.length ?? "—") + ' × ' + (item.width ?? "—") + '</td>' +
             '<td>' + (item.lat !== null && item.lon !== null ? '<a class="tag" target="_blank" rel="noopener" href="https://maps.google.com/?q=' + item.lat + ',' + item.lon + '">الخريطة</a>' : '—') + '</td>' +
-            '<td><div class="row-actions"><button class="row-action" type="button" data-edit-id="' + escapeHtml(item.recordId) + '">تعديل</button></div></td>' +
+            '<td><div class="row-actions"><button class="row-action" type="button" data-edit-id="' + escapeHtml(item.recordId) + '">تعديل</button><span class="tag">' + (item.locallyPending ? 'بانتظار المزامنة' : item.version ? 'سجل مركزي' : 'سجل أساسي رقمي') + '</span></div></td>' +
           '</tr>').join("") +
           '</tbody></table><div class="table-note">عرض ' + number.format(shown.length) + ' من ' + number.format(items.length) + ' سجلًا' + (items.length > limit ? ' · استخدم البحث لتضييق النتائج' : '') + '</div></div>';
       }
@@ -1157,7 +1226,8 @@
         });
         state.platform = window.IrrigationModules.createPlatform({
           sync:state.sync,
-          getAdministration:() => state.selected?.name || ""
+          getAdministration:() => state.selected?.name || "",
+          getBaseRecords:(type) => state.baseModuleRecords[type] || []
         });
         setSyncStatus({
           state:state.sync.isConfigured() ? (navigator.onLine ? "pending" : "offline") : "setup",
@@ -1167,13 +1237,31 @@
 
       async function loadData() {
         try {
-          const response = await fetch("./data/sector.json.gz?static=pwa-1",{cache:"no-store"});
-          if (!response.ok) throw new Error("تعذر تحميل البيانات");
-          if (!("DecompressionStream" in window)) throw new Error("المتصفح يحتاج إلى تحديث");
-          const stream = response.body.pipeThrough(new DecompressionStream("gzip"));
-          const payload = JSON.parse(await new Response(stream).text());
+          const supportsCompression = "DecompressionStream" in window;
+          const dataUrl = supportsCompression ? "./data/sector.json.gz?static=pwa-4" : "./data/sector.json?static=pwa-4";
+          let payload;
+          if (typeof fetch === "function") {
+            const response = await fetch(dataUrl,{cache:"no-store"});
+            if (!response.ok) throw new Error("تعذر تحميل البيانات");
+            payload = supportsCompression
+              ? JSON.parse(await new Response(response.body.pipeThrough(new DecompressionStream("gzip"))).text())
+              : await response.json();
+          } else if (!supportsCompression && typeof XMLHttpRequest === "function") {
+            payload = await new Promise((resolve,reject) => {
+              const request = new XMLHttpRequest();
+              request.open("GET",dataUrl,true);
+              request.onload = () => request.status >= 200 && request.status < 300
+                ? resolve(JSON.parse(request.responseText))
+                : reject(new Error("تعذر تحميل البيانات"));
+              request.onerror = () => reject(new Error("تعذر تحميل البيانات"));
+              request.send();
+            });
+          } else {
+            throw new Error("المتصفح يحتاج إلى تحديث");
+          }
           state.data = payload;
           state.baseAssets = decode(payload);
+          state.baseModuleRecords.canal_profile = makeBaseCanalProfiles(state.baseAssets);
           refreshAllViews();
           setStatus("متصل · البيانات محمّلة");
           if (state.sync.isConfigured()) state.sync.sync(true).catch(() => undefined);
@@ -1267,7 +1355,7 @@
       },60000);
 
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("./sw.js?v=sector-platform-3",{updateViaCache:"none"}).catch(() => undefined);
+        navigator.serviceWorker.register("./sw.js?v=sector-platform-4",{updateViaCache:"none"}).catch(() => undefined);
       }
 
       initializeSync();
