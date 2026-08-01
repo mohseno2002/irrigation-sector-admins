@@ -159,6 +159,21 @@
     .metric strong,.metric span { display:block; }
     .metric strong { font-size:27px; line-height:1.1; }
     .metric span { margin-top:5px; color:var(--muted); font-size:10px; }
+    .digitization-strip {
+      max-width:1360px; margin:16px auto 0; padding:0 clamp(14px,4vw,54px);
+      display:grid; grid-template-columns:1.4fr repeat(4,1fr); gap:1px;
+    }
+    .digitization-strip article {
+      min-height:86px; padding:15px 17px; display:grid; align-content:center;
+      border:1px solid var(--line); background:#fff;
+    }
+    .digitization-strip article:first-child { border-radius:18px 0 0 18px; background:linear-gradient(135deg,var(--navy),var(--blue)); color:#fff; }
+    .digitization-strip article:last-child { border-radius:0 18px 18px 0; }
+    .digitization-strip b,.digitization-strip strong,.digitization-strip span { display:block; }
+    .digitization-strip b { font-size:12px; }
+    .digitization-strip strong { color:var(--blue); font-size:22px; }
+    .digitization-strip span { margin-top:3px; color:var(--muted); font-size:9px; }
+    .digitization-strip article:first-child span { color:#cce7eb; }
 
     .section {
       max-width:1360px; margin:0 auto; padding:78px clamp(14px,4vw,54px) 0;
@@ -424,6 +439,9 @@
       .section-head .status,.admin-tools { margin-top:13px; }
       .status-group { justify-content:flex-start; }
       .overview-grid,.admin-grid { grid-template-columns:1fr; }
+      .digitization-strip { grid-template-columns:1fr 1fr; padding:0 12px; }
+      .digitization-strip article,.digitization-strip article:first-child,.digitization-strip article:last-child { border-radius:12px; }
+      .digitization-strip article:first-child { grid-column:1/-1; }
       .panel { padding:16px; border-radius:16px; }
       .bar-row { grid-template-columns:86px 1fr 40px; }
       .admin-tools,.search { width:100%; }
@@ -456,6 +474,272 @@
       .quality-card { min-height:110px; padding:13px; }
       footer { display:grid; gap:3px; }
       footer small { margin:0; }
+    }
+
+    /* Sector Platform 6 — professional hydraulic workspace */
+    :root {
+      --navy:#123f46;
+      --blue:#0b7088;
+      --blue-2:#147f94;
+      --aqua:#178b89;
+      --aqua-soft:#e7f2ef;
+      --paper:#f7f5ef;
+      --white:#fffefa;
+      --ink:#20393b;
+      --muted:#6f7a77;
+      --line:#d9d4c7;
+      --gold:#b59e70;
+      --green:#237c67;
+      --shadow:0 14px 36px rgba(39,55,52,.07);
+      --radius:26px;
+    }
+    body {
+      color:var(--ink);
+      background:
+        linear-gradient(125deg,rgba(23,139,137,.035),transparent 36%),
+        linear-gradient(180deg,#fbfaf6 0,var(--paper) 46rem);
+      font-family:"Noto Kufi Arabic","Segoe UI",Tahoma,Arial,sans-serif;
+      font-size:16px;
+      line-height:1.85;
+    }
+    .site-header {
+      max-width:1540px;
+      min-height:96px;
+      margin:0 auto;
+      padding:16px clamp(18px,4vw,66px);
+      gap:18px;
+      flex-wrap:wrap;
+      border-color:var(--line);
+      background:rgba(255,254,250,.96);
+    }
+    .brand { min-width:250px; gap:14px; }
+    .brand-mark {
+      width:58px; height:58px;
+      border-radius:18px;
+      font-size:32px;
+      background:linear-gradient(145deg,var(--aqua),var(--blue));
+      box-shadow:0 10px 24px rgba(11,112,136,.16);
+    }
+    .brand b { font-size:19px; letter-spacing:-.2px; }
+    .brand small { margin-top:1px; font-size:12px; }
+    .main-nav { gap:10px; }
+    .main-nav a {
+      min-height:46px;
+      padding:0 18px;
+      display:inline-flex;
+      align-items:center;
+      border:1px solid var(--line);
+      border-radius:999px;
+      color:#53625f;
+      background:var(--white);
+      font-size:14px;
+      font-weight:800;
+    }
+    .main-nav a:hover { color:var(--blue); border-color:#6aa8b5; background:#edf5f4; }
+    .install-button,.primary-button,.secondary-button,.danger-button {
+      min-height:50px;
+      padding:0 19px;
+      border-radius:15px;
+      font-size:14px;
+      letter-spacing:0;
+    }
+    .install-button,.primary-button { background:linear-gradient(135deg,var(--blue-2),var(--blue)); }
+    .secondary-button,.sync-button { color:var(--blue); background:#f5f8f5; border:1px solid var(--line); }
+    .header-actions { gap:10px; }
+    .hero { padding-top:74px; gap:58px; }
+    .eyebrow { font-size:14px; letter-spacing:.2px; }
+    .eyebrow::before { width:30px; }
+    .hero h1 { font-size:clamp(48px,6vw,76px); line-height:1.2; letter-spacing:-1.8px; }
+    .hero p { max-width:720px; font-size:18px; line-height:2; }
+    .hero-actions a { min-height:62px; min-width:260px; border-radius:19px; font-size:17px; }
+    .source-note { font-size:13px; }
+    .hierarchy { gap:10px; }
+    .hierarchy span { padding:10px 15px; border-color:var(--line); border-radius:14px; font-size:13px; background:var(--white); }
+    .hero-visual { min-height:410px; border-color:var(--line); background:linear-gradient(145deg,#eef6f2,var(--white)); }
+    .visual-seal { width:245px; padding:23px; border-color:var(--line); border-radius:25px; background:var(--white); }
+    .visual-seal small,.visual-seal span { font-size:12px; }
+    .visual-seal strong { font-size:34px; }
+    .metrics { gap:18px; }
+    .metric { min-height:132px; padding:23px; border-color:var(--line); border-radius:23px; background:var(--white); }
+    .metric-icon { width:58px; height:58px; border-radius:18px; font-size:25px; }
+    .metric strong { font-size:30px; }
+    .metric span { font-size:13px; }
+    .digitization-strip { gap:10px; }
+    .digitization-strip article { min-height:102px; padding:18px 20px; border-radius:18px !important; border-color:var(--line); background:var(--white); }
+    .digitization-strip b { font-size:15px; }
+    .digitization-strip strong { font-size:25px; }
+    .digitization-strip span { font-size:12px; }
+    .section { padding-top:92px; }
+    .section-head { margin-bottom:30px; }
+    .section-head h2 { font-size:38px; }
+    .section-head p { max-width:760px; font-size:15px; }
+    .status { padding:10px 15px; font-size:13px; background:var(--white); }
+    .panel,.admin-card,.workspace-shell,.small-card,.quality-card { border-color:var(--line); background:var(--white); }
+    .panel { padding:28px; }
+    .panel-title h3 { font-size:21px; }
+    .panel-title small { font-size:13px; }
+    .bar-row { grid-template-columns:150px 1fr 60px; gap:14px; font-size:14px; }
+    .bar-track { height:9px; }
+    .rank-row { min-height:56px; padding:10px 13px; border-color:#e6e1d6; border-radius:15px; background:#fcfbf7; }
+    .rank-row em,.rank-row span,.rank-row strong { font-size:14px; }
+    .search { min-height:54px; border-color:var(--line); border-radius:16px; background:var(--white); }
+    .search input { font-size:16px; }
+    .admin-grid { gap:20px; }
+    .admin-card { min-height:270px; padding:24px; border-radius:24px; }
+    .admin-index { width:52px; height:52px; border-radius:16px; font-size:14px; }
+    .admin-card small { font-size:12px; }
+    .admin-card h3 { font-size:19px; }
+    .admin-stats span { padding:13px 7px; font-size:11px; }
+    .admin-stats b { font-size:18px; }
+    .readiness span { font-size:11px; }
+    .workspace { margin-top:52px; }
+    .workspace-shell { border-radius:30px; }
+    .workspace-head { padding:34px 36px; background:linear-gradient(135deg,#124f5a,var(--blue)); }
+    .workspace-head h2 { font-size:35px; }
+    .workspace-head p { font-size:14px; }
+    .workspace-actions button { min-height:50px; padding:0 17px; border-radius:14px; font-size:14px; }
+    .workspace-metrics article { min-height:112px; padding:20px 24px; background:#fbfaf6; }
+    .workspace-metrics strong { font-size:29px; }
+    .workspace-metrics span { font-size:13px; }
+    .tabs { padding:15px; gap:10px; background:#fbfaf6; }
+    .tab { min-height:50px; padding:0 18px; border-color:var(--line); border-radius:999px; font-size:14px; background:var(--white); }
+    .tab[aria-selected="true"] { color:var(--blue); border-color:#4c9aac; background:#eaf3f1; }
+    .side-list { padding:20px; background:#f7f5ef; }
+    .side-list h3 { font-size:16px; }
+    .side-list button { min-height:62px; padding:10px 12px; border-color:#e7e1d5; border-radius:15px; font-size:13px; }
+    .table-panel { padding:24px; }
+    .table-head h3 { font-size:22px; }
+    .table-head p { font-size:13px; }
+    .filters { gap:9px; }
+    .filters input,.filters select { min-height:48px; padding:0 13px; border-color:var(--line); border-radius:13px; font-size:14px; }
+    .asset-table { border-color:var(--line); border-radius:18px; background:var(--white); }
+    table { min-width:960px; font-size:14px; }
+    th { padding:15px 13px; background:#efebe1; font-size:14px; }
+    td { padding:14px 13px; border-color:#e9e4d9; }
+    td small { font-size:12px; }
+    .tag { padding:5px 9px; font-size:11px; background:#e7f2ef; }
+    .row-action { min-height:40px; padding:0 13px; border-color:#b9d6d4; border-radius:11px; font-size:12px; }
+    .table-note { padding:14px; font-size:12px; background:#fbfaf6; }
+    .records-module,.module { padding:26px; }
+    .records-toolbar { padding:22px; border-color:var(--line); border-radius:22px; background:linear-gradient(135deg,#edf5f2,var(--white)); }
+    .records-heading h3,.module-intro h3 { font-size:22px; }
+    .records-heading p,.module-intro p { font-size:13px; }
+    .records-heading strong { font-size:30px; }
+    .records-empty span { font-size:13px; }
+    .module-intro { padding:24px; border-color:var(--line); border-radius:22px; background:linear-gradient(135deg,#edf5f2,var(--white)); }
+    .small-card { padding:18px; border-radius:17px; }
+    .small-card b { font-size:15px; }
+    .small-card span { font-size:13px; }
+    .small-card small { font-size:12px; }
+    .quality-card span { font-size:13px; }
+    .quality-note,.source-gap { font-size:13px; }
+    dialog { width:min(560px,calc(100% - 28px)); border:1px solid var(--line); border-radius:26px; background:var(--white); }
+    .dialog-wide { width:min(880px,calc(100% - 28px)); }
+    .dialog-body { padding:31px; }
+    .dialog-body h2 { font-size:27px; }
+    .dialog-body p { font-size:14px; }
+    .form-grid { gap:15px; margin-top:20px; }
+    .field { gap:7px; }
+    .field span { font-size:13px; }
+    .field input,.field select,.field textarea { min-height:54px; padding:11px 13px; border-color:var(--line); border-radius:14px; font-size:16px; background:var(--white); }
+    .field textarea { min-height:100px; }
+    .dialog-note { padding:13px 15px; border-color:var(--line); border-radius:13px; font-size:13px; background:#f7f5ef; }
+    .install-step { padding:14px; border-color:var(--line); border-radius:14px; font-size:14px; }
+    .record-code-field { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:10px; }
+    .record-code-button {
+      min-height:42px;
+      padding:7px 11px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      border:1px solid #9fc5c3;
+      border-radius:12px;
+      color:var(--blue);
+      background:#edf5f2;
+      font:800 12px/1.3 ui-monospace,SFMono-Regular,Consolas,monospace;
+      direction:ltr;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .record-code-button span { font-family:"Segoe UI",Tahoma,Arial,sans-serif; font-size:11px; direction:rtl; }
+    footer { padding-block:31px; background:var(--navy); }
+    footer span,footer small { font-size:13px; }
+
+    @media (max-width:1000px) {
+      .main-nav { display:flex; order:3; width:100%; overflow-x:auto; padding-bottom:3px; }
+      .hero { gap:36px; }
+      .structure { display:block; }
+    }
+
+    @media (max-width:640px) {
+      body { font-size:15px; }
+      .site-header { min-height:0; padding:12px; gap:11px; }
+      .brand { min-width:0; flex:1; }
+      .brand-mark { width:48px; height:48px; font-size:27px; }
+      .brand b { font-size:16px; }
+      .header-actions { width:auto; }
+      .install-button { min-height:44px; padding:0 11px; font-size:12px; }
+      .sync-button { display:none; }
+      .main-nav { gap:7px; }
+      .main-nav a { min-height:43px; padding:0 14px; font-size:13px; }
+      .hero { padding:50px 15px 32px; gap:30px; }
+      .eyebrow { font-size:13px; }
+      .hero h1 { font-size:clamp(41px,13vw,54px); line-height:1.3; }
+      .hero p { font-size:16px; line-height:2; }
+      .hero-actions a { min-height:58px; font-size:16px; }
+      .source-note { font-size:12px; }
+      .hierarchy span { font-size:12px; }
+      .hero-visual { min-height:300px; }
+      .visual-seal { width:205px; padding:18px; }
+      .metrics { grid-template-columns:1fr 1fr; gap:10px; }
+      .metric { min-height:116px; padding:14px; display:block; }
+      .metric-icon { width:42px; height:42px; margin-bottom:9px; }
+      .metric strong { font-size:24px; }
+      .metric span { font-size:12px; }
+      .digitization-strip article { min-height:96px; padding:15px; }
+      .section { padding-top:70px; }
+      .section-head h2 { font-size:31px; line-height:1.45; }
+      .section-head p { font-size:14px; }
+      .panel { padding:19px; }
+      .panel-title h3 { font-size:18px; }
+      .bar-row { grid-template-columns:100px 1fr 46px; font-size:12px; }
+      .rank-row span,.rank-row em,.rank-row strong { font-size:12px; }
+      .admin-card { min-height:250px; padding:20px; }
+      .admin-card h3 { font-size:18px; }
+      .workspace { padding:0 10px; }
+      .workspace-head { padding:25px 19px; }
+      .workspace-head h2 { font-size:28px; }
+      .workspace-head p { font-size:13px; }
+      .workspace-actions button { min-height:48px; font-size:13px; }
+      .workspace-metrics article { min-height:96px; padding:15px; }
+      .workspace-metrics strong { font-size:25px; }
+      .workspace-metrics span { font-size:12px; }
+      .tabs { padding:11px 9px; }
+      .tab { min-height:47px; padding:0 15px; font-size:13px; }
+      .side-list { padding:15px 12px; }
+      .side-list button { min-width:205px; font-size:13px; }
+      .table-panel { padding:14px 10px; }
+      .table-head h3 { font-size:20px; }
+      .filters input,.filters select { width:100%; min-height:51px; font-size:16px; }
+      table { min-width:980px; font-size:14px; }
+      th,td { padding:13px 12px; }
+      .records-module,.module { padding:12px 9px; }
+      .records-toolbar { padding:17px; }
+      .records-heading h3,.module-intro h3 { font-size:20px; }
+      .records-heading p,.module-intro p { font-size:12px; }
+      .records-actions button { min-height:50px; font-size:14px; }
+      .module-intro { padding:18px; }
+      .quality-grid { grid-template-columns:1fr; }
+      .dialog-body { padding:23px 17px; }
+      .dialog-body h2 { font-size:23px; }
+      .dialog-body p { font-size:13px; }
+      .field span { font-size:13px; }
+      .field input,.field select,.field textarea { min-height:54px; font-size:16px; }
+      .record-code-field { grid-template-columns:1fr; }
+      .record-code-button { min-height:46px; font-size:12px; }
+      .dialog-actions > button { flex:1 1 130px; }
+      footer { padding:26px 18px; }
     }
 
     @media print {
@@ -520,6 +804,14 @@
       <article class="metric"><span class="metric-icon">▰</span><div><strong id="metricAssets">—</strong><span>سجل منشأة فريد</span></div></article>
     </section>
 
+    <section class="digitization-strip" aria-label="موقف رقمنة البيانات">
+      <article><b>رقمنة شاملة للسجل</b><span>كل سجل قائم أو جديد له معرّف ثابت ومسار تحديث ومراجعة.</span></article>
+      <article><strong id="digitizedAssets">—</strong><span>منشأة قائمة مرقمنة</span></article>
+      <article><strong id="digitizedCanals">—</strong><span>ترعة قائمة بأورنيك رقمي</span></article>
+      <article><strong id="centralRecords">—</strong><span>سجل مركزي مضاف أو محدّث</span></article>
+      <article><strong id="pendingRecords">—</strong><span>تعديل ينتظر المزامنة</span></article>
+    </section>
+
     <section class="section" id="overview">
       <div class="section-head">
         <div><span class="eyebrow">الموقف القطاعي</span><h2>قراءة تنفيذية من مصدر واحد</h2><p>مؤشرات محسوبة مباشرة من السجل المرفق بعد إزالة التكرارات المطابقة.</p></div>
@@ -572,7 +864,7 @@
           <button class="tab" role="tab" aria-selected="true" data-tab="structure">الهيكل الإداري</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="assets">الكباري والمنشآت</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="covers">التغطيات</button>
-          <button class="tab" role="tab" aria-selected="false" data-tab="properties">الأملاك</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="property">الأملاك</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="canal_profile">أورنيك الترع</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="license">التراخيص</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="violation">محاضر المخالفات</button>
@@ -613,17 +905,7 @@
           </div>
         </section>
 
-        <section class="tab-panel" data-panel="properties" hidden>
-          <div class="module">
-            <div class="module-intro gold"><span class="module-icon">◇</span><div><h3>سجل الأملاك</h3><p>وحدة جاهزة للربط عند توفير بيانات الملكيات والحيازات والتعديات.</p></div><strong>—</strong></div>
-            <div class="source-gap"><b>فجوة مصدر معلنة</b>الملف المرفق لا يحتوي على بيانات أملاك أو حدود قطع أو حالات تعدٍّ؛ لذلك لا يعرض التطبيق أرقامًا افتراضية. يمكن إضافة الوحدة فور توافر مصدر رسمي.</div>
-            <div class="cards-list">
-              <article class="small-card"><b>بيانات القطعة</b><span>المساحة · الحدود · الإحداثيات</span><small>مطلوب مصدر رسمي</small></article>
-              <article class="small-card"><b>الموقف القانوني</b><span>ملكية · انتفاع · تعدٍ</span><small>مطلوب مصدر رسمي</small></article>
-              <article class="small-card"><b>المتابعة الميدانية</b><span>محضر · إجراء · تاريخ</span><small>مطلوب مصدر رسمي</small></article>
-            </div>
-          </div>
-        </section>
+        <section class="tab-panel" data-panel="property" hidden><div class="records-module" data-record-module="property"></div></section>
 
         <section class="tab-panel" data-panel="canal_profile" hidden><div class="records-module" data-record-module="canal_profile"></div></section>
         <section class="tab-panel" data-panel="license" hidden><div class="records-module" data-record-module="license"></div></section>
@@ -676,6 +958,7 @@
       <p>يُحفظ التعديل في الجهاز فورًا، ثم يُرسل إلى Google Sheets ويظهر على كل الأجهزة المتصلة.</p>
       <input id="assetRecordId" type="hidden">
       <div class="form-grid">
+        <label class="field full"><span>كود السجل</span><div class="record-code-field"><input id="assetRecordCode" type="text" readonly><button class="record-code-button" id="copyAssetRecordCode" type="button">نسخ الكود</button></div></label>
         <label class="field"><span>الإدارة *</span><input id="editAdm" type="text" maxlength="240" required></label>
         <label class="field"><span>الهندسة *</span><input id="editEng" type="text" maxlength="240" required></label>
         <label class="field"><span>الترعة أو المجرى *</span><input id="editCanal" type="text" maxlength="240" required></label>
@@ -713,10 +996,10 @@
     </form>
   </dialog>
 
-  <footer><b>إدارات قطاع الري</b><span>منصة قطاعية شاملة مع مزامنة Google Sheets والعمل دون اتصال.</span><small>الإصدار Sector Platform 3.0</small></footer>
+  <footer><b>إدارات قطاع الري</b><span>منصة قطاعية شاملة مع مزامنة Google Sheets والعمل دون اتصال.</span><small>الإصدار Sector Platform 6.0 · أكواد رقمية تلقائية</small></footer>
 
-  <script src="./sync-client.js?v=3"></script>
-  <script src="./platform-modules.js?v=3"></script>
+  <script src="./sync-client.js?v=6"></script>
+  <script src="./platform-modules.js?v=6"></script>
   <script>
     (() => {
       "use strict";
@@ -725,6 +1008,7 @@
       const state = {
         data:null,
         baseAssets:[],
+        baseModuleRecords:{},
         assets:[],
         summaries:[],
         selected:null,
@@ -743,6 +1027,29 @@
         const text = value == null ? "" : String(value);
         return /[,"\n]/.test(text) ? '"' + text.replaceAll('"','""') + '"' : text;
       };
+
+      async function copyRecordCode(code,button) {
+        const value = String(code || "");
+        if (!value) return;
+        try {
+          if (navigator.clipboard?.writeText) await navigator.clipboard.writeText(value);
+          else {
+            const input = document.createElement("textarea");
+            input.value = value;
+            input.setAttribute("readonly","");
+            input.style.opacity = "0";
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand("copy");
+            input.remove();
+          }
+          const previous = button.textContent;
+          button.textContent = "تم النسخ";
+          window.setTimeout(() => { button.textContent = previous; },1200);
+        } catch {
+          window.prompt("انسخ كود السجل",value);
+        }
+      }
 
       function decode(payload) {
         return payload.R.map((row,index) => {
@@ -763,9 +1070,56 @@
             lat:row[12] === -1 ? null : row[12],
             version:0
           };
+          asset.recordSource = "السجل الأساسي الرقمي";
           asset.recordId = window.IrrigationSync.stableRecordId(asset);
           return asset;
         });
+      }
+
+      function makeBaseCanalProfiles(items) {
+        const profiles = new Map();
+        for (const asset of items) {
+          if (!asset.canal || asset.canal === "غير محدد") continue;
+          const identity = [asset.adm, asset.eng, asset.canal];
+          const recordId = window.IrrigationSync.stableEntityRecordId("canal_profile", identity);
+          if (profiles.has(recordId)) continue;
+          profiles.set(recordId, {
+            recordId,
+            entityType:"canal_profile",
+            adm:asset.adm,
+            eng:asset.eng,
+            canalName:asset.canal,
+            canalCode:window.IrrigationSync.displayRecordCode(recordId,"canal_profile"),
+            canalClass:"",
+            sourceCanal:"",
+            startKm:null,
+            endKm:null,
+            lengthKm:null,
+            designDischarge:null,
+            currentDischarge:null,
+            bedWidthDesign:null,
+            bedWidthCurrent:null,
+            bedLevelStart:null,
+            bedLevelEnd:null,
+            waterLevelUpstream:null,
+            waterLevelDownstream:null,
+            bankLevelRight:null,
+            bankLevelLeft:null,
+            commandAreaFeddan:null,
+            servedVillages:"",
+            liningStatus:"",
+            linedLengthKm:null,
+            operationalStatus:"",
+            lastDredgingDate:"",
+            maintenancePriority:"",
+            latitude:null,
+            longitude:null,
+            notes:"",
+            recordSource:"السجل الأساسي الرقمي",
+            version:0
+          });
+        }
+        return [...profiles.values()];
       }
 
       function readiness(items) {
@@ -842,6 +1196,11 @@
         byId("metricCanals").textContent = number.format(canals);
         byId("metricAssets").textContent = number.format(assets.length);
         byId("heroGeocoded").textContent = number.format(geocoded);
+        const baseCanals = state.baseModuleRecords.canal_profile || [];
+        byId("digitizedAssets").textContent = number.format(state.baseAssets.length);
+        byId("digitizedCanals").textContent = number.format(baseCanals.length);
+        byId("centralRecords").textContent = number.format(state.sync ? state.sync.remoteCount() : 0);
+        byId("pendingRecords").textContent = number.format(state.sync ? state.sync.pendingCount() : 0);
       }
 
       function renderOverview() {
@@ -888,8 +1247,11 @@
       function tableHtml(items,limit=250) {
         const shown = items.slice(0,limit);
         if (!shown.length) return '<div class="empty">لا توجد سجلات مطابقة.</div>';
-        return '<div class="asset-table"><table><thead><tr><th>المنشأة</th><th>التصنيف</th><th>الترعة</th><th>النوع</th><th>الكيلومتر</th><th>الأبعاد م</th><th>الموقع</th><th>التحديث</th></tr></thead><tbody>' +
-          shown.map(item => '<tr>' +
+        return '<div class="asset-table"><table><thead><tr><th>كود السجل</th><th>المنشأة</th><th>التصنيف</th><th>الترعة</th><th>النوع</th><th>الكيلومتر</th><th>الأبعاد م</th><th>الموقع</th><th>التحديث</th></tr></thead><tbody>' +
+          shown.map(item => {
+            const recordCode = window.IrrigationSync.displayRecordCode(item.recordId,"asset");
+            return '<tr>' +
+            '<td><button class="record-code-button" type="button" data-copy-record-code="' + escapeHtml(recordCode) + '" title="نسخ كود السجل">' + escapeHtml(recordCode) + '<span>نسخ</span></button></td>' +
             '<td><b>' + escapeHtml(item.name) + '</b><small>' + escapeHtml(item.eng) + (item.locallyPending ? ' · بانتظار المزامنة' : '') + '</small></td>' +
             '<td><span class="tag">' + escapeHtml(classify(item)) + '</span></td>' +
             '<td>' + escapeHtml(item.canal) + '</td>' +
@@ -897,8 +1259,9 @@
             '<td class="numeric">' + (item.km ?? "—") + '</td>' +
             '<td class="numeric">' + (item.length ?? "—") + ' × ' + (item.width ?? "—") + '</td>' +
             '<td>' + (item.lat !== null && item.lon !== null ? '<a class="tag" target="_blank" rel="noopener" href="https://maps.google.com/?q=' + item.lat + ',' + item.lon + '">الخريطة</a>' : '—') + '</td>' +
-            '<td><div class="row-actions"><button class="row-action" type="button" data-edit-id="' + escapeHtml(item.recordId) + '">تعديل</button></div></td>' +
-          '</tr>').join("") +
+            '<td><div class="row-actions"><button class="row-action" type="button" data-edit-id="' + escapeHtml(item.recordId) + '">تعديل</button><span class="tag">' + (item.locallyPending ? 'بانتظار المزامنة' : item.version ? 'سجل مركزي' : 'سجل أساسي رقمي') + '</span></div></td>' +
+          '</tr>';
+          }).join("") +
           '</tbody></table><div class="table-note">عرض ' + number.format(shown.length) + ' من ' + number.format(items.length) + ' سجلًا' + (items.length > limit ? ' · استخدم البحث لتضييق النتائج' : '') + '</div></div>';
       }
 
@@ -938,7 +1301,8 @@
         const type = byId("assetType").value;
         const items = state.selected.assets.filter(item => {
           if (type && classify(item) !== type) return false;
-          return !term || [item.name,item.canal,item.eng,item.type].join(" ").includes(term);
+          const recordCode = window.IrrigationSync.displayRecordCode(item.recordId,"asset");
+          return !term || [recordCode,item.name,item.canal,item.eng,item.type].join(" ").toLowerCase().includes(term.toLowerCase());
         });
         byId("assetsTable").innerHTML = tableHtml(items,350);
       }
@@ -1022,8 +1386,8 @@
 
       function exportCsv() {
         if (!state.selected) return;
-        const header = ["الإدارة","الهندسة","الترعة","اسم المنشأة","التصنيف","النوع","الاستخدام","المادة","الكيلومتر","الطول م","العرض م","خط الطول","دائرة العرض","المحافظة"];
-        const rows = state.selected.assets.map(x => [x.adm,x.eng,x.canal,x.name,classify(x),x.type,x.use,x.material,x.km,x.length,x.width,x.lon,x.lat,x.gov]);
+        const header = ["كود السجل","الإدارة","الهندسة","الترعة","اسم المنشأة","التصنيف","النوع","الاستخدام","المادة","الكيلومتر","الطول م","العرض م","خط الطول","دائرة العرض","المحافظة","المعرف الداخلي"];
+        const rows = state.selected.assets.map(x => [window.IrrigationSync.displayRecordCode(x.recordId,"asset"),x.adm,x.eng,x.canal,x.name,classify(x),x.type,x.use,x.material,x.km,x.length,x.width,x.lon,x.lat,x.gov,x.recordId]);
         const csv = "\ufeff" + [header,...rows].map(row => row.map(csvCell).join(",")).join("\n");
         const blob = new Blob([csv],{type:"text/csv;charset=utf-8"});
         const url = URL.createObjectURL(blob);
@@ -1067,6 +1431,7 @@
         };
         byId("assetDialogTitle").textContent = existing ? "تعديل بيانات المنشأة" : "إضافة منشأة جديدة";
         setFormValue("assetRecordId",asset.recordId);
+        setFormValue("assetRecordCode",window.IrrigationSync.displayRecordCode(asset.recordId,"asset"));
         setFormValue("editAdm",asset.adm);
         setFormValue("editEng",asset.eng);
         setFormValue("editCanal",asset.canal);
@@ -1157,7 +1522,8 @@
         });
         state.platform = window.IrrigationModules.createPlatform({
           sync:state.sync,
-          getAdministration:() => state.selected?.name || ""
+          getAdministration:() => state.selected?.name || "",
+          getBaseRecords:(type) => state.baseModuleRecords[type] || []
         });
         setSyncStatus({
           state:state.sync.isConfigured() ? (navigator.onLine ? "pending" : "offline") : "setup",
@@ -1167,13 +1533,31 @@
 
       async function loadData() {
         try {
-          const response = await fetch("./data/sector.json.gz?static=pwa-1",{cache:"no-store"});
-          if (!response.ok) throw new Error("تعذر تحميل البيانات");
-          if (!("DecompressionStream" in window)) throw new Error("المتصفح يحتاج إلى تحديث");
-          const stream = response.body.pipeThrough(new DecompressionStream("gzip"));
-          const payload = JSON.parse(await new Response(stream).text());
+          const supportsCompression = "DecompressionStream" in window;
+          const dataUrl = supportsCompression ? "./data/sector.json.gz?static=pwa-4" : "./data/sector.json?static=pwa-4";
+          let payload;
+          if (typeof fetch === "function") {
+            const response = await fetch(dataUrl,{cache:"no-store"});
+            if (!response.ok) throw new Error("تعذر تحميل البيانات");
+            payload = supportsCompression
+              ? JSON.parse(await new Response(response.body.pipeThrough(new DecompressionStream("gzip"))).text())
+              : await response.json();
+          } else if (!supportsCompression && typeof XMLHttpRequest === "function") {
+            payload = await new Promise((resolve,reject) => {
+              const request = new XMLHttpRequest();
+              request.open("GET",dataUrl,true);
+              request.onload = () => request.status >= 200 && request.status < 300
+                ? resolve(JSON.parse(request.responseText))
+                : reject(new Error("تعذر تحميل البيانات"));
+              request.onerror = () => reject(new Error("تعذر تحميل البيانات"));
+              request.send();
+            });
+          } else {
+            throw new Error("المتصفح يحتاج إلى تحديث");
+          }
           state.data = payload;
           state.baseAssets = decode(payload);
+          state.baseModuleRecords.canal_profile = makeBaseCanalProfiles(state.baseAssets);
           refreshAllViews();
           setStatus("متصل · البيانات محمّلة");
           if (state.sync.isConfigured()) state.sync.sync(true).catch(() => undefined);
@@ -1186,6 +1570,11 @@
       }
 
       document.addEventListener("click",(event) => {
+        const copyCode = event.target.closest("[data-copy-record-code]");
+        if (copyCode) {
+          copyRecordCode(copyCode.dataset.copyRecordCode,copyCode);
+          return;
+        }
         const edit = event.target.closest("[data-edit-id]");
         if (edit) {
           openAssetDialog(edit.dataset.editId);
@@ -1223,6 +1612,7 @@
         runSyncFromDialog(true);
       });
       byId("assetClose").addEventListener("click",() => byId("assetDialog").close());
+      byId("copyAssetRecordCode").addEventListener("click",event => copyRecordCode(byId("assetRecordCode").value,event.currentTarget));
       byId("assetForm").addEventListener("submit",(event) => {
         event.preventDefault();
         if (!event.currentTarget.reportValidity()) return;
@@ -1267,7 +1657,7 @@
       },60000);
 
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("./sw.js?v=sector-platform-3",{updateViaCache:"none"}).catch(() => undefined);
+        navigator.serviceWorker.register("./sw.js?v=sector-platform-6",{updateViaCache:"none"}).catch(() => undefined);
       }
 
       initializeSync();
