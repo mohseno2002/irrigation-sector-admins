@@ -1,10 +1,12 @@
 const CACHE_PREFIX = "irrigation-sector-admins-";
-const CACHE = "irrigation-sector-admins-static-pwa-1";
+const CACHE = "irrigation-sector-admins-sector-platform-3";
 const ROOT = new URL("./", self.registration.scope);
 const CORE = [
   new URL("./index.html", ROOT).href,
   new URL("./manifest.webmanifest", ROOT).href,
   new URL("./pwa-icon.svg", ROOT).href,
+  new URL("./sync-client.js", ROOT).href,
+  new URL("./platform-modules.js", ROOT).href,
   new URL("./data/sector.json.gz", ROOT).href,
 ];
 

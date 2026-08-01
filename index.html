@@ -43,7 +43,7 @@
       line-height:1.65;
       touch-action:pan-y pinch-zoom;
     }
-    button,input,select { font:inherit; }
+    button,input,select,textarea { font:inherit; }
     button,a { -webkit-tap-highlight-color:transparent; }
     a { color:inherit; text-decoration:none; }
     [hidden] { display:none !important; }
@@ -79,6 +79,8 @@
     }
     .install-button,.primary-button { color:#fff; background:linear-gradient(135deg,var(--blue),var(--navy)); }
     .secondary-button { color:var(--blue); background:#edf7f9; border:1px solid #cce7eb; }
+    .header-actions { display:flex; align-items:center; gap:8px; }
+    .sync-button { color:var(--blue); background:#edf7f9; border:1px solid #cce7eb; }
 
     .hero {
       max-width:1460px;
@@ -175,6 +177,10 @@
     .status::before { content:""; width:8px; height:8px; border-radius:50%; background:currentColor; }
     .status.loading { color:var(--warn); background:#fff9ec; }
     .status.error { color:var(--red); background:#fff4f4; }
+    .status.pending,.status.syncing { color:var(--warn); background:#fff9ec; }
+    .status.offline { color:var(--muted); background:#f4f7f8; }
+    .status.conflict { color:var(--red); background:#fff4f4; }
+    .status-group { display:flex; align-items:center; justify-content:flex-end; gap:7px; flex-wrap:wrap; }
 
     .overview-grid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
     .panel { padding:22px; border:1px solid var(--line); border-radius:var(--radius); background:#fff; box-shadow:var(--shadow); }
@@ -290,6 +296,12 @@
     td small { margin-top:2px; color:var(--muted); }
     .tag { display:inline-block; padding:3px 7px; border-radius:999px; color:var(--blue); background:#e7f5f7; font-size:8px; font-weight:800; }
     .numeric { direction:ltr; text-align:left; white-space:nowrap; }
+    .row-actions { display:flex; align-items:center; gap:5px; white-space:nowrap; }
+    .row-action {
+      min-height:31px; padding:0 9px; border:1px solid #cce5e9; border-radius:8px;
+      color:var(--blue); background:#f4fbfc; cursor:pointer; font-size:8px; font-weight:900;
+    }
+    .row-action:hover { background:#e5f7f5; }
     .table-note { padding:11px; text-align:center; color:var(--muted); background:#fff; font-size:9px; }
 
     .module { padding:22px; }
@@ -319,15 +331,51 @@
     .quality-card i { display:block; height:100%; background:linear-gradient(90deg,var(--aqua),var(--blue)); }
     .quality-note { grid-column:1/-1; padding:15px; border-right:4px solid var(--gold); border-radius:10px; color:var(--muted); background:#fff9e9; font-size:10px; }
 
+    .records-module { padding:20px; }
+    .records-toolbar {
+      margin-bottom:14px; padding:16px; display:flex; align-items:center; justify-content:space-between; gap:14px;
+      border:1px solid #c5e5e7; border-radius:16px; background:linear-gradient(135deg,#edfafa,#fff);
+    }
+    .records-heading { display:flex; align-items:center; gap:11px; min-width:0; }
+    .records-heading h3 { margin:0; font-size:18px; }
+    .records-heading p { margin:3px 0 0; color:var(--muted); font-size:9px; }
+    .records-heading strong { min-width:42px; color:var(--blue); font-size:25px; text-align:center; }
+    .records-actions { display:flex; align-items:center; justify-content:flex-end; gap:7px; flex-wrap:wrap; }
+    .search.compact { width:240px; min-height:42px; }
+    .records-table table { min-width:1000px; }
+    .records-empty { min-height:220px; display:grid; place-content:center; gap:5px; text-align:center; border:1px dashed var(--line); border-radius:15px; color:var(--muted); background:#fff; }
+    .records-empty b { color:var(--blue); font-size:14px; }
+    .records-empty span { font-size:10px; }
+    .record-link { color:var(--blue); text-decoration:underline; font-weight:800; }
+    input[readonly] { color:var(--muted); background:#f1f6f7 !important; }
+
     .loading-card { min-height:180px; display:grid; place-items:center; color:var(--muted); }
     .spinner { width:34px; height:34px; margin:0 auto 9px; border:3px solid #d8e8ec; border-top-color:var(--aqua); border-radius:50%; animation:spin .75s linear infinite; }
     @keyframes spin { to { transform:rotate(360deg); } }
 
-    dialog { width:min(460px,calc(100% - 28px)); padding:0; border:0; border-radius:20px; color:var(--ink); background:#fff; box-shadow:0 28px 70px rgba(8,51,68,.28); }
+    dialog { width:min(460px,calc(100% - 28px)); max-height:calc(100% - 28px); overflow:auto; overscroll-behavior:contain; padding:0; border:0; border-radius:20px; color:var(--ink); background:#fff; box-shadow:0 28px 70px rgba(8,51,68,.28); }
     dialog::backdrop { background:rgba(8,51,68,.62); }
     .dialog-body { padding:25px; }
     .dialog-body h2 { margin:0; font-size:21px; }
     .dialog-body p { color:var(--muted); font-size:10px; }
+    .dialog-wide { width:min(780px,calc(100% - 28px)); }
+    .form-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; margin-top:16px; }
+    .field { display:grid; gap:5px; }
+    .field.full { grid-column:1/-1; }
+    .field span { color:var(--muted); font-size:9px; font-weight:800; }
+    .field input,.field select,.field textarea {
+      width:100%; min-height:43px; padding:8px 10px; border:1px solid var(--line);
+      border-radius:10px; outline:0; color:var(--ink); background:#fff; font-size:11px;
+    }
+    .field textarea { min-height:76px; resize:vertical; }
+    .field input:focus,.field select:focus,.field textarea:focus { border-color:#8fc7d0; box-shadow:0 0 0 3px rgba(14,116,144,.08); }
+    .dialog-actions { display:flex; align-items:center; justify-content:flex-end; gap:8px; flex-wrap:wrap; margin-top:17px; }
+    .danger-button {
+      min-height:42px; padding:0 15px; border:1px solid #efc7c7; border-radius:12px;
+      color:var(--red); background:#fff4f4; cursor:pointer; font-size:10px; font-weight:900;
+    }
+    .dialog-note { margin-top:12px; padding:10px 12px; border:1px solid var(--line); border-radius:10px; color:var(--muted); background:#f7fbfc; font-size:9px; }
+    .dialog-note.error { color:var(--red); border-color:#efc7c7; background:#fff4f4; }
     .install-steps { display:grid; gap:8px; }
     .install-step { padding:11px; display:flex; gap:9px; align-items:center; border:1px solid var(--line); border-radius:11px; background:#f8fbfc; font-size:10px; }
     .install-step b { width:29px; height:29px; flex:0 0 auto; display:grid; place-items:center; border-radius:8px; color:var(--blue); background:var(--aqua-soft); }
@@ -374,6 +422,7 @@
       .section-head { display:block; }
       .section-head h2 { font-size:25px; }
       .section-head .status,.admin-tools { margin-top:13px; }
+      .status-group { justify-content:flex-start; }
       .overview-grid,.admin-grid { grid-template-columns:1fr; }
       .panel { padding:16px; border-radius:16px; }
       .bar-row { grid-template-columns:86px 1fr 40px; }
@@ -384,6 +433,8 @@
       .workspace-head { padding:21px 17px; display:block; border-radius:18px 18px 0 0; }
       .workspace-head h2 { font-size:23px; }
       .workspace-actions { margin-top:13px; }
+      .form-grid { grid-template-columns:1fr; }
+      .field.full { grid-column:auto; }
       .workspace-metrics { grid-template-columns:repeat(2,1fr); }
       .workspace-metrics article { min-height:73px; padding:11px; border-bottom:1px solid var(--line); }
       .tabs { padding:8px; }
@@ -395,6 +446,10 @@
       .filters input { width:100%; }
       .cards-list { grid-template-columns:1fr; }
       .module { padding:13px; }
+      .records-module { padding:10px; }
+      .records-toolbar { padding:13px; display:block; }
+      .records-actions { margin-top:12px; justify-content:stretch; }
+      .records-actions .search,.records-actions button { width:100%; }
       .module-intro { grid-template-columns:45px 1fr; padding:15px; }
       .module-intro strong { grid-column:1/-1; }
       .quality-grid { grid-template-columns:repeat(2,1fr); padding:13px; gap:8px; }
@@ -429,7 +484,10 @@
       <a href="#administrations">الإدارات</a>
       <a href="#workspace">تفاصيل الإدارة</a>
     </nav>
-    <button class="install-button" id="installButton" type="button">تثبيت التطبيق</button>
+    <div class="header-actions">
+      <button class="install-button sync-button" id="syncSettingsButton" type="button">إعداد المزامنة</button>
+      <button class="install-button" id="installButton" type="button">تثبيت التطبيق</button>
+    </div>
   </header>
 
   <main id="top">
@@ -465,7 +523,10 @@
     <section class="section" id="overview">
       <div class="section-head">
         <div><span class="eyebrow">الموقف القطاعي</span><h2>قراءة تنفيذية من مصدر واحد</h2><p>مؤشرات محسوبة مباشرة من السجل المرفق بعد إزالة التكرارات المطابقة.</p></div>
-        <span class="status loading" id="dataStatus">جارٍ تحميل البيانات</span>
+        <div class="status-group">
+          <span class="status loading" id="dataStatus">جارٍ تحميل البيانات</span>
+          <button class="status offline" id="syncStatus" type="button">المزامنة غير مفعّلة</button>
+        </div>
       </div>
       <div class="overview-grid">
         <article class="panel">
@@ -496,6 +557,7 @@
         <div class="workspace-head">
           <div><span class="eyebrow">بطاقة الإدارة التشغيلية</span><h2 id="workspaceTitle">—</h2><p id="workspaceSubtitle">—</p></div>
           <div class="workspace-actions">
+            <button id="addAsset" type="button">إضافة منشأة</button>
             <button id="exportCsv" type="button">تصدير CSV</button>
             <button id="printAdmin" type="button">طباعة التقرير</button>
           </div>
@@ -511,6 +573,12 @@
           <button class="tab" role="tab" aria-selected="false" data-tab="assets">الكباري والمنشآت</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="covers">التغطيات</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="properties">الأملاك</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="canal_profile">أورنيك الترع</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="license">التراخيص</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="violation">محاضر المخالفات</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="removal_decision">قرارات الإزالة</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="human_resource">الموارد البشرية</button>
+          <button class="tab" role="tab" aria-selected="false" data-tab="lined_canal">الترع المبطنة</button>
           <button class="tab" role="tab" aria-selected="false" data-tab="quality">جودة البيانات</button>
         </div>
 
@@ -557,6 +625,13 @@
           </div>
         </section>
 
+        <section class="tab-panel" data-panel="canal_profile" hidden><div class="records-module" data-record-module="canal_profile"></div></section>
+        <section class="tab-panel" data-panel="license" hidden><div class="records-module" data-record-module="license"></div></section>
+        <section class="tab-panel" data-panel="violation" hidden><div class="records-module" data-record-module="violation"></div></section>
+        <section class="tab-panel" data-panel="removal_decision" hidden><div class="records-module" data-record-module="removal_decision"></div></section>
+        <section class="tab-panel" data-panel="human_resource" hidden><div class="records-module" data-record-module="human_resource"></div></section>
+        <section class="tab-panel" data-panel="lined_canal" hidden><div class="records-module" data-record-module="lined_canal"></div></section>
+
         <section class="tab-panel" data-panel="quality" hidden>
           <div class="quality-grid" id="qualityGrid"></div>
         </section>
@@ -577,8 +652,71 @@
     </div>
   </dialog>
 
-  <footer><b>إدارات قطاع الري</b><span>صفحة PWA ثابتة بدون React أو تمرير برمجي.</span><small>الإصدار Static PWA 1.0</small></footer>
+  <dialog id="syncDialog">
+    <form class="dialog-body" id="syncForm">
+      <h2>إعداد المزامنة المركزية</h2>
+      <p>يربط هذا الجهاز بقاعدة Google Sheets، ويحفظ التعديلات محليًا عند انقطاع الإنترنت ثم يرسلها تلقائيًا عند عودته.</p>
+      <div class="form-grid">
+        <label class="field full"><span>رابط Google Apps Script Web app</span><input id="syncEndpoint" type="url" inputmode="url" placeholder="https://script.google.com/macros/s/.../exec" required></label>
+        <label class="field"><span>مفتاح المزامنة</span><input id="syncKey" type="password" autocomplete="current-password" required></label>
+        <label class="field"><span>اسم المستخدم في سجل المراجعة</span><input id="syncUser" type="text" maxlength="120" placeholder="مثال: م. محسن عبد الرشيد" required></label>
+      </div>
+      <div class="dialog-note" id="syncDialogNote">قاعدة البيانات: «قاعدة مزامنة تطبيق إدارات قطاع الري».</div>
+      <div class="dialog-actions">
+        <button class="secondary-button" id="syncClose" type="button">إغلاق</button>
+        <button class="secondary-button" id="syncNow" type="button">اختبار الاتصال</button>
+        <button class="primary-button" type="submit">حفظ ومزامنة</button>
+      </div>
+    </form>
+  </dialog>
 
+  <dialog class="dialog-wide" id="assetDialog">
+    <form class="dialog-body" id="assetForm">
+      <h2 id="assetDialogTitle">تعديل بيانات المنشأة</h2>
+      <p>يُحفظ التعديل في الجهاز فورًا، ثم يُرسل إلى Google Sheets ويظهر على كل الأجهزة المتصلة.</p>
+      <input id="assetRecordId" type="hidden">
+      <div class="form-grid">
+        <label class="field"><span>الإدارة *</span><input id="editAdm" type="text" maxlength="240" required></label>
+        <label class="field"><span>الهندسة *</span><input id="editEng" type="text" maxlength="240" required></label>
+        <label class="field"><span>الترعة أو المجرى *</span><input id="editCanal" type="text" maxlength="240" required></label>
+        <label class="field"><span>المحافظة</span><input id="editGov" type="text" maxlength="160"></label>
+        <label class="field full"><span>اسم المنشأة *</span><input id="editName" type="text" maxlength="300" required></label>
+        <label class="field"><span>النوع</span><input id="editType" type="text" maxlength="160"></label>
+        <label class="field"><span>الاستخدام</span><input id="editUse" type="text" maxlength="160"></label>
+        <label class="field"><span>المادة</span><input id="editMaterial" type="text" maxlength="160"></label>
+        <label class="field"><span>الكيلومتر</span><input id="editKm" type="number" min="0" max="100000" step="any" inputmode="decimal"></label>
+        <label class="field"><span>الطول (م)</span><input id="editLength" type="number" min="0" max="100000" step="any" inputmode="decimal"></label>
+        <label class="field"><span>العرض (م)</span><input id="editWidth" type="number" min="0" max="100000" step="any" inputmode="decimal"></label>
+        <label class="field"><span>خط الطول</span><input id="editLon" type="number" min="-180" max="180" step="any" inputmode="decimal"></label>
+        <label class="field"><span>دائرة العرض</span><input id="editLat" type="number" min="-90" max="90" step="any" inputmode="decimal"></label>
+      </div>
+      <div class="dialog-note" id="assetDialogNote">الحقول المعلّمة بنجمة مطلوبة.</div>
+      <div class="dialog-actions">
+        <button class="danger-button" id="deleteAsset" type="button">حذف مع إمكانية المراجعة</button>
+        <button class="secondary-button" id="assetClose" type="button">إلغاء</button>
+        <button class="primary-button" type="submit">حفظ التعديل</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog class="dialog-wide" id="recordDialog">
+    <form class="dialog-body" id="recordForm">
+      <h2 id="recordDialogTitle">إضافة سجل</h2>
+      <p>كل سجل مرتبط بالإدارة الحالية، ويُحفظ على الجهاز ثم يتزامن مع Google Sheets وباقي الأجهزة.</p>
+      <div class="form-grid" id="recordFields"></div>
+      <div class="dialog-note" id="recordDialogNote">الحقول المعلّمة بنجمة مطلوبة.</div>
+      <div class="dialog-actions">
+        <button class="danger-button" id="deleteRecord" type="button">حذف مع الاحتفاظ بالمراجعة</button>
+        <button class="secondary-button" id="recordClose" type="button">إلغاء</button>
+        <button class="primary-button" type="submit">حفظ السجل</button>
+      </div>
+    </form>
+  </dialog>
+
+  <footer><b>إدارات قطاع الري</b><span>منصة قطاعية شاملة مع مزامنة Google Sheets والعمل دون اتصال.</span><small>الإصدار Sector Platform 3.0</small></footer>
+
+  <script src="./sync-client.js?v=3"></script>
+  <script src="./platform-modules.js?v=3"></script>
   <script>
     (() => {
       "use strict";
@@ -586,12 +724,15 @@
       const number = new Intl.NumberFormat("ar-EG");
       const state = {
         data:null,
+        baseAssets:[],
         assets:[],
         summaries:[],
         selected:null,
         selectedEngineer:"",
         selectedCanal:"",
-        installPrompt:null
+        installPrompt:null,
+        sync:null,
+        platform:null
       };
 
       const byId = (id) => document.getElementById(id);
@@ -604,22 +745,27 @@
       };
 
       function decode(payload) {
-        return payload.R.map((row,index) => ({
-          id:index,
-          adm:payload.A[row[0]] || "غير محدد",
-          eng:payload.E[row[1]] || "غير محدد",
-          canal:payload.C[row[2]] || "غير محدد",
-          gov:payload.G[row[3]] || "غير محدد",
-          type:payload.T[row[4]] || "غير مسجل",
-          use:payload.U[row[5]] || "غير محدد",
-          material:payload.M[row[6]] || "غير محدد",
-          name:payload.N[row[7]] || "منشأ بدون اسم",
-          km:row[8] === -1 ? null : row[8],
-          length:row[9] === -1 ? null : row[9],
-          width:row[10] === -1 ? null : row[10],
-          lon:row[11] === -1 ? null : row[11],
-          lat:row[12] === -1 ? null : row[12]
-        }));
+        return payload.R.map((row,index) => {
+          const asset = {
+            id:index,
+            adm:payload.A[row[0]] || "غير محدد",
+            eng:payload.E[row[1]] || "غير محدد",
+            canal:payload.C[row[2]] || "غير محدد",
+            gov:payload.G[row[3]] || "غير محدد",
+            type:payload.T[row[4]] || "غير مسجل",
+            use:payload.U[row[5]] || "غير محدد",
+            material:payload.M[row[6]] || "غير محدد",
+            name:payload.N[row[7]] || "منشأ بدون اسم",
+            km:row[8] === -1 ? null : row[8],
+            length:row[9] === -1 ? null : row[9],
+            width:row[10] === -1 ? null : row[10],
+            lon:row[11] === -1 ? null : row[11],
+            lat:row[12] === -1 ? null : row[12],
+            version:0
+          };
+          asset.recordId = window.IrrigationSync.stableRecordId(asset);
+          return asset;
+        });
       }
 
       function readiness(items) {
@@ -666,6 +812,23 @@
         const element = byId("dataStatus");
         element.textContent = text;
         element.className = "status" + (kind ? " " + kind : "");
+      }
+
+      function setSyncStatus(detail) {
+        const element = byId("syncStatus");
+        const pending = detail.pending || 0;
+        const labels = {
+          setup:"المزامنة غير مفعّلة",
+          syncing:"جارٍ التزامن" + (pending ? " · " + number.format(pending) + " معلّق" : ""),
+          pending:number.format(pending) + " تعديل معلّق",
+          offline:"بدون اتصال" + (pending ? " · " + number.format(pending) + " معلّق" : ""),
+          conflict:"تعارض يحتاج مراجعة",
+          error:"تعذر التزامن" + (pending ? " · " + number.format(pending) + " معلّق" : ""),
+          synced:"متزامن مع Google Sheets"
+        };
+        element.textContent = labels[detail.state] || labels.setup;
+        element.className = "status " + (detail.state || "offline");
+        element.title = detail.error || "";
       }
 
       function renderMetrics() {
@@ -725,15 +888,16 @@
       function tableHtml(items,limit=250) {
         const shown = items.slice(0,limit);
         if (!shown.length) return '<div class="empty">لا توجد سجلات مطابقة.</div>';
-        return '<div class="asset-table"><table><thead><tr><th>المنشأة</th><th>التصنيف</th><th>الترعة</th><th>النوع</th><th>الكيلومتر</th><th>الأبعاد م</th><th>الموقع</th></tr></thead><tbody>' +
+        return '<div class="asset-table"><table><thead><tr><th>المنشأة</th><th>التصنيف</th><th>الترعة</th><th>النوع</th><th>الكيلومتر</th><th>الأبعاد م</th><th>الموقع</th><th>التحديث</th></tr></thead><tbody>' +
           shown.map(item => '<tr>' +
-            '<td><b>' + escapeHtml(item.name) + '</b><small>' + escapeHtml(item.eng) + '</small></td>' +
+            '<td><b>' + escapeHtml(item.name) + '</b><small>' + escapeHtml(item.eng) + (item.locallyPending ? ' · بانتظار المزامنة' : '') + '</small></td>' +
             '<td><span class="tag">' + escapeHtml(classify(item)) + '</span></td>' +
             '<td>' + escapeHtml(item.canal) + '</td>' +
             '<td>' + escapeHtml(item.type) + '</td>' +
             '<td class="numeric">' + (item.km ?? "—") + '</td>' +
             '<td class="numeric">' + (item.length ?? "—") + ' × ' + (item.width ?? "—") + '</td>' +
             '<td>' + (item.lat !== null && item.lon !== null ? '<a class="tag" target="_blank" rel="noopener" href="https://maps.google.com/?q=' + item.lat + ',' + item.lon + '">الخريطة</a>' : '—') + '</td>' +
+            '<td><div class="row-actions"><button class="row-action" type="button" data-edit-id="' + escapeHtml(item.recordId) + '">تعديل</button></div></td>' +
           '</tr>').join("") +
           '</tbody></table><div class="table-note">عرض ' + number.format(shown.length) + ' من ' + number.format(items.length) + ' سجلًا' + (items.length > limit ? ' · استخدم البحث لتضييق النتائج' : '') + '</div></div>';
       }
@@ -803,24 +967,52 @@
         }).join("") + '<div class="quality-note"><b>مهم:</b> مؤشرات الاكتمال لا تعبّر عن الحالة الإنشائية. قرار الصيانة أو الإحلال يحتاج فحصًا ميدانيًا وبيانات عمر المنشأ والأحمال والنحر والاختبارات.</div>';
       }
 
-      function selectAdmin(name) {
-        const summary = state.summaries.find(item => item.name === name);
-        if (!summary) return;
+      function renderSelectedWorkspace(resetFilters) {
+        const selectedName = typeof state.selected === "string" ? state.selected : state.selected?.name;
+        const summary = state.summaries.find(item => item.name === selectedName);
+        if (!summary) {
+          state.selected = null;
+          byId("workspace").hidden = true;
+          return;
+        }
         state.selected = summary;
-        state.selectedEngineer = "";
-        state.selectedCanal = "";
+        if (resetFilters) {
+          state.selectedEngineer = "";
+          state.selectedCanal = "";
+          byId("assetSearch").value = "";
+        } else {
+          if (!summary.assets.some(item => item.eng === state.selectedEngineer)) state.selectedEngineer = "";
+          if (state.selectedCanal && !summary.assets.some(item => (!state.selectedEngineer || item.eng === state.selectedEngineer) && item.canal === state.selectedCanal)) state.selectedCanal = "";
+        }
         byId("workspace").hidden = false;
         byId("workspaceTitle").textContent = summary.name;
-        byId("workspaceSubtitle").textContent = summary.governorates.join(" · ") + " · مصدر البيانات: السجل المرفق";
+        byId("workspaceSubtitle").textContent = summary.governorates.join(" · ") + " · المصدر الأساسي + تحديثات Google Sheets";
         byId("wsEngineers").textContent = number.format(summary.engineers);
         byId("wsCanals").textContent = number.format(summary.canals);
         byId("wsAssets").textContent = number.format(summary.assets.length);
         byId("wsReadiness").textContent = number.format(summary.readiness) + "٪";
-        byId("assetSearch").value = "";
         renderStructure();
         renderAssets();
         renderCovers();
         renderQuality();
+        state.platform?.refresh();
+      }
+
+      function refreshAllViews() {
+        state.assets = state.sync ? state.sync.applyOverlay(state.baseAssets) : state.baseAssets.slice();
+        state.summaries = makeSummaries(state.assets);
+        renderMetrics();
+        renderOverview();
+        renderAdminGrid(byId("adminSearch").value);
+        if (state.selected) renderSelectedWorkspace(false);
+        else state.platform?.refresh();
+      }
+
+      function selectAdmin(name) {
+        const summary = state.summaries.find(item => item.name === name);
+        if (!summary) return;
+        state.selected = summary;
+        renderSelectedWorkspace(true);
       }
 
       function activateTab(name) {
@@ -844,6 +1036,135 @@
         setTimeout(() => URL.revokeObjectURL(url),1000);
       }
 
+      function optionalNumber(id) {
+        const value = byId(id).value.trim();
+        return value === "" ? null : Number(value);
+      }
+
+      function setFormValue(id,value) {
+        byId(id).value = value == null ? "" : String(value);
+      }
+
+      function openAssetDialog(recordId) {
+        const existing = recordId ? state.assets.find(item => item.recordId === recordId) : null;
+        const summary = state.selected;
+        const asset = existing || {
+          recordId:state.sync.makeRecordId(),
+          adm:summary?.name || "",
+          eng:state.selectedEngineer || "",
+          canal:state.selectedCanal || "",
+          gov:summary?.governorates?.[0] || "",
+          name:"",
+          type:"",
+          use:"",
+          material:"",
+          km:null,
+          length:null,
+          width:null,
+          lon:null,
+          lat:null,
+          version:0
+        };
+        byId("assetDialogTitle").textContent = existing ? "تعديل بيانات المنشأة" : "إضافة منشأة جديدة";
+        setFormValue("assetRecordId",asset.recordId);
+        setFormValue("editAdm",asset.adm);
+        setFormValue("editEng",asset.eng);
+        setFormValue("editCanal",asset.canal);
+        setFormValue("editGov",asset.gov);
+        setFormValue("editName",asset.name);
+        setFormValue("editType",asset.type === "غير مسجل" ? "" : asset.type);
+        setFormValue("editUse",asset.use === "غير محدد" ? "" : asset.use);
+        setFormValue("editMaterial",asset.material === "غير محدد" ? "" : asset.material);
+        setFormValue("editKm",asset.km);
+        setFormValue("editLength",asset.length);
+        setFormValue("editWidth",asset.width);
+        setFormValue("editLon",asset.lon);
+        setFormValue("editLat",asset.lat);
+        byId("deleteAsset").hidden = !existing;
+        byId("assetDialogNote").textContent = existing && existing.locallyPending
+          ? "هذا السجل لديه تعديل محلي بانتظار المزامنة."
+          : "الحقول المعلّمة بنجمة مطلوبة.";
+        byId("assetDialog").showModal();
+      }
+
+      function assetFromForm() {
+        const existing = state.assets.find(item => item.recordId === byId("assetRecordId").value);
+        return {
+          recordId:byId("assetRecordId").value,
+          id:existing?.id ?? byId("assetRecordId").value,
+          adm:byId("editAdm").value.trim(),
+          eng:byId("editEng").value.trim(),
+          canal:byId("editCanal").value.trim(),
+          gov:byId("editGov").value.trim() || "غير محدد",
+          name:byId("editName").value.trim(),
+          type:byId("editType").value.trim() || "غير مسجل",
+          use:byId("editUse").value.trim() || "غير محدد",
+          material:byId("editMaterial").value.trim() || "غير محدد",
+          km:optionalNumber("editKm"),
+          length:optionalNumber("editLength"),
+          width:optionalNumber("editWidth"),
+          lon:optionalNumber("editLon"),
+          lat:optionalNumber("editLat"),
+          version:existing?.version || 0
+        };
+      }
+
+      function openSyncDialog() {
+        const config = state.sync.getConfig();
+        setFormValue("syncEndpoint",config.endpoint);
+        setFormValue("syncKey",config.key);
+        setFormValue("syncUser",config.user);
+        const pending = state.sync.pendingCount();
+        const conflicts = state.sync.getConflicts().length;
+        byId("syncDialogNote").className = "dialog-note";
+        byId("syncDialogNote").textContent =
+          "قاعدة البيانات جاهزة · " + number.format(pending) + " تعديل معلّق" +
+          (conflicts ? " · " + number.format(conflicts) + " تعارض محفوظ للمراجعة" : "");
+        byId("syncDialog").showModal();
+      }
+
+      function saveSyncFields() {
+        return state.sync.saveConfig({
+          endpoint:byId("syncEndpoint").value,
+          key:byId("syncKey").value,
+          user:byId("syncUser").value
+        });
+      }
+
+      async function runSyncFromDialog(closeAfter) {
+        const note = byId("syncDialogNote");
+        try {
+          if (!byId("syncForm").reportValidity()) return;
+          saveSyncFields();
+          note.className = "dialog-note";
+          note.textContent = "جارٍ اختبار الاتصال والمزامنة…";
+          const result = await state.sync.sync(true);
+          if (!result || result.ok !== true) throw new Error("لم يكتمل الاتصال");
+          note.textContent = "تم الاتصال بنجاح، وأصبحت بيانات هذا الجهاز متزامنة.";
+          if (closeAfter) byId("syncDialog").close();
+        } catch (error) {
+          note.className = "dialog-note error";
+          note.textContent = "تعذر الاتصال: " + error.message;
+        }
+      }
+
+      function initializeSync() {
+        state.sync = window.IrrigationSync.createSyncManager({
+          onStatus:setSyncStatus,
+          onDataChange:() => {
+            if (state.baseAssets.length) refreshAllViews();
+          }
+        });
+        state.platform = window.IrrigationModules.createPlatform({
+          sync:state.sync,
+          getAdministration:() => state.selected?.name || ""
+        });
+        setSyncStatus({
+          state:state.sync.isConfigured() ? (navigator.onLine ? "pending" : "offline") : "setup",
+          pending:state.sync.pendingCount()
+        });
+      }
+
       async function loadData() {
         try {
           const response = await fetch("./data/sector.json.gz?static=pwa-1",{cache:"no-store"});
@@ -852,12 +1173,10 @@
           const stream = response.body.pipeThrough(new DecompressionStream("gzip"));
           const payload = JSON.parse(await new Response(stream).text());
           state.data = payload;
-          state.assets = decode(payload);
-          state.summaries = makeSummaries(state.assets);
-          renderMetrics();
-          renderOverview();
-          renderAdminGrid();
+          state.baseAssets = decode(payload);
+          refreshAllViews();
           setStatus("متصل · البيانات محمّلة");
+          if (state.sync.isConfigured()) state.sync.sync(true).catch(() => undefined);
         } catch (error) {
           setStatus("تعذر تحميل البيانات","error");
           byId("adminGrid").innerHTML = '<div class="empty">تعذر تحميل ملف البيانات. أعد فتح الصفحة أثناء الاتصال بالإنترنت.</div>';
@@ -867,6 +1186,11 @@
       }
 
       document.addEventListener("click",(event) => {
+        const edit = event.target.closest("[data-edit-id]");
+        if (edit) {
+          openAssetDialog(edit.dataset.editId);
+          return;
+        }
         const admin = event.target.closest("[data-admin]");
         if (admin) selectAdmin(admin.dataset.admin);
         const tab = event.target.closest(".tab");
@@ -887,8 +1211,35 @@
       byId("adminSearch").addEventListener("input",event => renderAdminGrid(event.target.value));
       byId("assetSearch").addEventListener("input",filterAssets);
       byId("assetType").addEventListener("change",filterAssets);
+      byId("addAsset").addEventListener("click",() => openAssetDialog(""));
       byId("exportCsv").addEventListener("click",exportCsv);
       byId("printAdmin").addEventListener("click",() => window.print());
+      byId("syncSettingsButton").addEventListener("click",openSyncDialog);
+      byId("syncStatus").addEventListener("click",openSyncDialog);
+      byId("syncClose").addEventListener("click",() => byId("syncDialog").close());
+      byId("syncNow").addEventListener("click",() => runSyncFromDialog(false));
+      byId("syncForm").addEventListener("submit",(event) => {
+        event.preventDefault();
+        runSyncFromDialog(true);
+      });
+      byId("assetClose").addEventListener("click",() => byId("assetDialog").close());
+      byId("assetForm").addEventListener("submit",(event) => {
+        event.preventDefault();
+        if (!event.currentTarget.reportValidity()) return;
+        const asset = assetFromForm();
+        state.sync.queueUpsert(asset);
+        byId("assetDialog").close();
+        state.sync.sync(false).catch(() => undefined);
+      });
+      byId("deleteAsset").addEventListener("click",() => {
+        const asset = state.assets.find(item => item.recordId === byId("assetRecordId").value);
+        if (!asset) return;
+        const confirmed = window.confirm("سيُحذف «" + asset.name + "» من جميع الأجهزة بعد المزامنة، مع الاحتفاظ بالعملية في سجل المراجعة. هل تريد المتابعة؟");
+        if (!confirmed) return;
+        state.sync.queueDelete(asset);
+        byId("assetDialog").close();
+        state.sync.sync(false).catch(() => undefined);
+      });
       byId("closeInstallDialog").addEventListener("click",() => byId("installDialog").close());
       byId("installButton").addEventListener("click",async () => {
         if (state.installPrompt) {
@@ -902,11 +1253,24 @@
         event.preventDefault();
         state.installPrompt = event;
       },{once:true});
+      window.addEventListener("online",() => state.sync.sync(false).catch(() => undefined));
+      window.addEventListener("offline",() => setSyncStatus({state:"offline",pending:state.sync.pendingCount()}));
+      document.addEventListener("visibilitychange",() => {
+        if (document.visibilityState === "visible" && state.sync.isConfigured()) {
+          state.sync.sync(false).catch(() => undefined);
+        }
+      });
+      window.setInterval(() => {
+        if (state.sync.isConfigured() && document.visibilityState === "visible") {
+          state.sync.sync(false).catch(() => undefined);
+        }
+      },60000);
 
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("./sw.js?v=static-pwa-1",{updateViaCache:"none"}).catch(() => undefined);
+        navigator.serviceWorker.register("./sw.js?v=sector-platform-3",{updateViaCache:"none"}).catch(() => undefined);
       }
 
+      initializeSync();
       loadData();
     })();
   </script>
