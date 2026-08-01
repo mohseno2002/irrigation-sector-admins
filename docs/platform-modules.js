@@ -314,9 +314,13 @@
       const adm = getAdministration();
       const allRecords = adm ? recordsFor(type) : [];
       const term = String(searches[type] || "").trim().toLowerCase();
-      const records = term ? allRecords.filter((record) => JSON.stringify(record).toLowerCase().includes(term)) : allRecords;
+      const records = term ? allRecords.filter((record) => {
+        const recordCode = root.IrrigationSync.displayRecordCode(record.recordId, type);
+        return (recordCode + " " + JSON.stringify(record)).toLowerCase().includes(term);
+      }) : allRecords;
       const headings = definition.columns.map((key) => '<th>' + escapeHtml(fieldLabel(definition, key)) + '</th>').join("");
       const rows = records.slice(0, 500).map((record) => {
+        const recordCode = root.IrrigationSync.displayRecordCode(record.recordId, type);
         const cells = definition.columns.map((key) => {
           const field = definition.fields.find((item) => item.key === key);
           const value = displayValue(field, record[key]);
@@ -329,13 +333,13 @@
           : record.version
             ? '<span class="tag">سجل مركزي</span>'
             : '<span class="tag">سجل أساسي رقمي</span>';
-        return '<tr>' + cells + '<td><div class="row-actions"><button class="row-action" type="button" data-module-edit="' + escapeHtml(record.recordId) + '" data-module-type="' + type + '">تعديل</button>' + sourceBadge + '</div></td></tr>';
+        return '<tr><td><button class="record-code-button" type="button" data-copy-record-code="' + escapeHtml(recordCode) + '" title="نسخ كود السجل">' + escapeHtml(recordCode) + '<span>نسخ</span></button></td>' + cells + '<td><div class="row-actions"><button class="row-action" type="button" data-module-edit="' + escapeHtml(record.recordId) + '" data-module-type="' + type + '">تعديل</button>' + sourceBadge + '</div></td></tr>';
       }).join("");
       element.innerHTML =
         '<div class="records-toolbar"><div class="records-heading"><span class="module-icon">' + definition.icon + '</span><div><h3>' + escapeHtml(definition.title) + '</h3><p>' + escapeHtml(adm ? definition.description : "اختر إدارة أولًا") + '</p></div><strong>' + number.format(allRecords.length) + '</strong></div>' +
         '<div class="records-actions"><label class="search compact"><b>⌕</b><input type="search" data-module-search="' + type + '" value="' + escapeHtml(searches[type] || "") + '" placeholder="بحث داخل السجلات…"></label><button class="secondary-button" type="button" data-module-export="' + type + '"' + (!adm ? " disabled" : "") + '>تصدير CSV</button><button class="primary-button" type="button" data-module-add="' + type + '"' + (!adm ? " disabled" : "") + '>إضافة ' + escapeHtml(definition.singular) + '</button></div></div>' +
         (records.length
-          ? '<div class="asset-table records-table"><table><thead><tr>' + headings + '<th>الإجراء</th></tr></thead><tbody>' + rows + '</tbody></table></div><div class="table-note">يعرض ' + number.format(records.length) + ' من ' + number.format(allRecords.length) + ' سجل داخل ' + escapeHtml(adm) + '.</div>'
+          ? '<div class="asset-table records-table"><table><thead><tr><th>كود السجل</th>' + headings + '<th>الإجراء</th></tr></thead><tbody>' + rows + '</tbody></table></div><div class="table-note">يعرض ' + number.format(records.length) + ' من ' + number.format(allRecords.length) + ' سجل داخل ' + escapeHtml(adm) + '.</div>'
           : '<div class="records-empty"><b>' + (term ? "لا توجد نتائج مطابقة" : "لا توجد سجلات بعد") + '</b><span>' + (adm ? 'ابدأ بإضافة ' + escapeHtml(definition.singular) + ' لهذه الإدارة.' : 'اختر إحدى الإدارات من الدليل الإداري.') + '</span></div>');
     }
 
@@ -351,8 +355,14 @@
       if (!adm) return;
       activeType = type;
       activeId = existing?.recordId || sync.makeRecordId(type);
+      const recordCode = root.IrrigationSync.displayRecordCode(activeId, type);
       title.textContent = existing ? "تعديل " + definition.singular : "إضافة " + definition.singular;
-      fields.innerHTML = '<label class="field full"><span>الإدارة</span><input value="' + escapeHtml(adm) + '" readonly></label>' + definition.fields.map((field) => fieldControl(field, existing?.[field.key])).join("");
+      fields.innerHTML = '<label class="field full"><span>كود السجل الرقمي</span><div class="record-code-field"><input value="' + escapeHtml(recordCode) + '" readonly><button class="record-code-button" type="button" data-copy-record-code="' + escapeHtml(recordCode) + '">نسخ الكود</button></div></label><label class="field full"><span>الإدارة</span><input value="' + escapeHtml(adm) + '" readonly></label>' + definition.fields.map((field) => {
+        const value = type === "canal_profile" && field.key === "canalCode" && !existing?.canalCode
+          ? recordCode
+          : existing?.[field.key];
+        return fieldControl(field, value);
+      }).join("");
       note.className = "dialog-note";
       note.textContent = existing?.locallyPending ? "هذا السجل لديه تعديل محلي بانتظار المزامنة." : "سيُحفظ السجل محليًا فورًا ثم يتزامن مع جميع الأجهزة.";
       deleteButton.hidden = !existing;
@@ -374,8 +384,8 @@
       const definition = MODULES[type];
       const adm = getAdministration();
       const records = recordsFor(type);
-      const header = ["الإدارة", ...definition.fields.map((field) => field.label.replace(" *", "")), "المعرف", "الإصدار"];
-      const rows = records.map((record) => [adm, ...definition.fields.map((field) => record[field.key]), record.recordId, record.version || 0]);
+      const header = ["كود السجل", "الإدارة", ...definition.fields.map((field) => field.label.replace(" *", "")), "المعرف الداخلي", "الإصدار"];
+      const rows = records.map((record) => [root.IrrigationSync.displayRecordCode(record.recordId, type), adm, ...definition.fields.map((field) => record[field.key]), record.recordId, record.version || 0]);
       const blob = new Blob(["\ufeff" + [header, ...rows].map((row) => row.map(csvCell).join(",")).join("\n")], { type: "text/csv;charset=utf-8" });
       const url = URL.createObjectURL(blob);
       const link = root.document.createElement("a");
