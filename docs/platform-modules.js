@@ -11,6 +11,34 @@
   };
 
   const MODULES = {
+    coverage: {
+      title: "التغطيات",
+      singular: "تغطية",
+      icon: "▤",
+      description: "سجل رقمي كامل للتغطيات القائمة والمقترحة وحالتها الإنشائية والتشغيلية.",
+      keyField: "coverageName",
+      columns: ["coverageName", "canalName", "eng", "startKm", "lengthM", "coverageType", "structuralCondition", "status"],
+      fields: [
+        { key: "coverageName", label: "اسم أو وصف التغطية *", type: "text", required: true, maxLength: 300, full: true },
+        { key: "canalName", label: "الترعة أو المجرى *", type: "text", required: true, maxLength: 240 },
+        { key: "eng", label: "الهندسة التابعة *", type: "text", required: true, maxLength: 240 },
+        { key: "startKm", label: "بداية التغطية (كم)", type: "number", min: 0, max: 100000, step: "any" },
+        { key: "endKm", label: "نهاية التغطية (كم)", type: "number", min: 0, max: 100000, step: "any" },
+        { key: "lengthM", label: "الطول (م)", type: "number", min: 0, max: 10000000, step: "any" },
+        { key: "widthM", label: "العرض أو الفتحة (م)", type: "number", min: 0, max: 100000, step: "any" },
+        { key: "coverageType", label: "نوع التغطية", type: "select", options: ["بلاطات خرسانية", "مواسير", "برابخ", "صندوقية", "مسلحة", "أخرى"] },
+        { key: "purpose", label: "الغرض", type: "select", options: ["مرور سيارات", "مشاة", "توسعة طريق", "خدمات", "حماية", "أخرى"] },
+        { key: "material", label: "المادة الإنشائية", type: "text", maxLength: 180 },
+        { key: "executionYear", label: "سنة التنفيذ", type: "number", min: 1900, max: 2200, step: 1 },
+        { key: "structuralCondition", label: "الحالة الإنشائية", type: "select", options: ["جيدة", "متوسطة", "تحتاج صيانة", "خطرة", "غير مقيمة"] },
+        { key: "status", label: "الحالة التشغيلية", type: "select", options: ["عاملة", "متوقفة", "تحت التنفيذ", "مقترحة", "ملغاة"] },
+        { key: "lastInspectionDate", label: "تاريخ آخر معاينة", type: "date" },
+        { key: "latitude", label: "دائرة العرض", type: "number", min: -90, max: 90, step: "any" },
+        { key: "longitude", label: "خط الطول", type: "number", min: -180, max: 180, step: "any" },
+        common.documentUrl,
+        common.notes,
+      ],
+    },
     property: {
       title: "الأملاك",
       singular: "سجل ملكية",
