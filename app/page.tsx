@@ -228,6 +228,23 @@ export default function Home() {
     setCategory("الكل");
   };
 
+  const selectWorkspaceTab = (nextTab: WorkspaceTab) => {
+    if (nextTab === activeTab) return;
+
+    const currentScrollY = window.scrollY;
+    const tabStrip = document.querySelector<HTMLElement>(".workspace-tabs");
+    const currentTabScroll = tabStrip?.scrollLeft ?? 0;
+
+    setActiveTab(nextTab);
+
+    window.requestAnimationFrame(() => {
+      if (tabStrip) tabStrip.scrollLeft = currentTabScroll;
+      if (window.innerWidth <= 640 && Math.abs(window.scrollY - currentScrollY) > 1) {
+        window.scrollTo({ top: currentScrollY, left: 0, behavior: "auto" });
+      }
+    });
+  };
+
   const selectedSummary = summaries.find((item) => item.name === selected) ?? null;
   const engineers = useMemo(() => {
     if (!selectedSummary) return [];
@@ -492,10 +509,23 @@ export default function Home() {
                 ["properties", "الأملاك"],
                 ["quality", "جودة البيانات"],
               ].map(([id, label]) => (
-                <button key={id} role="tab" aria-selected={activeTab === id} className={activeTab === id ? "active" : ""} onClick={() => setActiveTab(id as WorkspaceTab)}>{label}</button>
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-selected={activeTab === id}
+                  className={activeTab === id ? "active" : ""}
+                  onClick={(event) => {
+                    event.currentTarget.blur();
+                    selectWorkspaceTab(id as WorkspaceTab);
+                  }}
+                >
+                  {label}
+                </button>
               ))}
             </div>
 
+            <div className="workspace-content-shell">
             {(activeTab === "structure" || activeTab === "assets") && (
               <div className="asset-browser">
                 <aside className="engineer-panel">
@@ -593,6 +623,7 @@ export default function Home() {
                 <div className="quality-note"><b>مهم:</b> جاهزية البيانات لا تعبّر عن الحالة الإنشائية. قرار الصيانة أو الإحلال يحتاج فحصًا ميدانيًا وبيانات عمر المنشأ والأحمال والنحر والاختبارات.</div>
               </div>
             )}
+            </div>
           </>
         )}
       </section>

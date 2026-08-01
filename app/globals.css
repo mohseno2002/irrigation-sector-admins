@@ -171,6 +171,7 @@ main { min-height: 100vh; overflow: hidden; background: radial-gradient(circle a
 .workspace-tabs { display: flex; gap: 6px; padding: 12px 15px; border-bottom: 1px solid var(--line); background: white; overflow-x: auto; }
 .workspace-tabs button { white-space: nowrap; padding: 8px 13px; border: 1px solid transparent; border-radius: 10px; color: var(--muted); background: transparent; font-size: 9.5px; font-weight: 700; cursor: pointer; }
 .workspace-tabs button.active { color: var(--blue); border-color: #cce6eb; background: #eaf7f8; }
+.workspace-content-shell { min-height: 610px; overflow-anchor: none; }
 
 .asset-browser { display: grid; grid-template-columns: 225px 225px minmax(0, 1fr); min-height: 610px; }
 .engineer-panel, .canal-panel { padding: 15px; border-left: 1px solid var(--line); background: #f8fbfc; min-width: 0; }
@@ -279,7 +280,10 @@ footer small { margin-inline-start: auto; }
 }
 
 @media (max-width: 640px) {
+  html { scroll-behavior: auto; overflow-x: hidden; }
+  body { overflow-x: hidden; overscroll-behavior-x: none; }
   .topbar { height: 68px; padding: 0 14px; gap: 8px; }
+  .topbar { background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; }
   .brand { min-width: 0; margin-inline-end: auto; }
   .brand-wave { width: 38px; height: 38px; }
   .brand b { font-size: 14px; }
@@ -316,14 +320,19 @@ footer small { margin-inline-start: auto; }
   .admin-grid { grid-template-columns: 1fr; }
   .admin-card { border-radius: 17px; }
   .admin-workspace { margin: 12px 14px 45px; }
+  .admin-workspace.open { animation: none; transform: none; }
   .workspace-empty { padding: 30px 18px; }
   .workspace-hero { display: block; padding: 22px 18px; }
   .workspace-hero h2 { font-size: 23px; }
   .workspace-actions { margin-top: 17px; }
   .workspace-metrics { grid-template-columns: repeat(2, 1fr); }
   .workspace-metrics article { min-height: 78px; padding: 12px; border-bottom: 1px solid var(--line); }
-  .workspace-tabs { padding: 9px; }
+  .workspace-tabs { padding: 9px; scroll-behavior: auto; overscroll-behavior-x: contain; scrollbar-width: none; touch-action: pan-x; overflow-anchor: none; }
+  .workspace-tabs::-webkit-scrollbar { display: none; }
+  .workspace-tabs button { flex: 0 0 auto; transform: none; }
+  .workspace-content-shell { min-height: 660px; overflow-anchor: none; contain: layout; }
   .asset-browser { display: block; }
+  .asset-browser, .module-view, .quality-view { min-height: 660px; }
   .engineer-panel, .canal-panel { border: 0; border-bottom: 1px solid var(--line); }
   .engineer-panel { display: block; }
   .engineer-panel .scroll-list { display: flex; max-height: none; overflow-x: auto; }
@@ -341,7 +350,7 @@ footer small { margin-inline-start: auto; }
   .quality-view { grid-template-columns: repeat(2, 1fr); padding: 13px; gap: 8px; }
   .quality-view article { min-height: 110px; padding: 14px; }
   .quality-flags { grid-template-columns: 1fr; }
-  .mobile-dock { height: 68px; padding: 8px 10px max(8px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(5, 1fr); align-items: end; position: fixed; right: 9px; left: 9px; bottom: 8px; z-index: 70; border: 1px solid rgba(213,230,237,.95); border-radius: 20px; background: rgba(255,255,255,.94); backdrop-filter: blur(18px); box-shadow: 0 14px 38px rgba(7,59,92,.18); }
+  .mobile-dock { height: 68px; padding: 8px 10px max(8px, env(safe-area-inset-bottom)); display: grid; grid-template-columns: repeat(5, 1fr); align-items: end; position: fixed; right: 9px; left: 9px; bottom: 8px; z-index: 70; border: 1px solid rgba(213,230,237,.95); border-radius: 20px; background: #fff; backdrop-filter: none; -webkit-backdrop-filter: none; backface-visibility: hidden; transform: translateZ(0); contain: layout paint; box-shadow: 0 14px 38px rgba(7,59,92,.18); }
   .mobile-dock a, .mobile-dock button { height: 45px; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; border: 0; border-radius: 12px; color: var(--muted); background: transparent; cursor: pointer; }
   .mobile-dock b { color: var(--blue); font-size: 16px; line-height: 1; }
   .mobile-dock span { font-size: 7px; font-weight: 700; }
@@ -349,7 +358,8 @@ footer small { margin-inline-start: auto; }
   .mobile-dock .dock-main b { color: white; }
   .install-dialog { padding: 25px 20px 20px; border-radius: 21px; }
   .install-dialog h2 { font-size: 20px; }
-  main { padding-bottom: 82px; }
+  .install-overlay { animation: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  main { padding-bottom: 82px; overflow-x: clip; }
   footer { display: grid; gap: 4px; }
   footer small { margin: 0; }
 }
