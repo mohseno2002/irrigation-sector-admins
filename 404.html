@@ -476,7 +476,7 @@
       footer small { margin:0; }
     }
 
-    /* Sector Platform 5 — professional hydraulic workspace */
+    /* Sector Platform 6 — professional hydraulic workspace */
     :root {
       --navy:#123f46;
       --blue:#0b7088;
@@ -996,10 +996,10 @@
     </form>
   </dialog>
 
-  <footer><b>إدارات قطاع الري</b><span>منصة قطاعية شاملة مع مزامنة Google Sheets والعمل دون اتصال.</span><small>الإصدار Sector Platform 5.0 · واجهة تشغيل احترافية</small></footer>
+  <footer><b>إدارات قطاع الري</b><span>منصة قطاعية شاملة مع مزامنة Google Sheets والعمل دون اتصال.</span><small>الإصدار Sector Platform 6.0 · أكواد رقمية تلقائية</small></footer>
 
-  <script src="./sync-client.js?v=5"></script>
-  <script src="./platform-modules.js?v=5"></script>
+  <script src="./sync-client.js?v=6"></script>
+  <script src="./platform-modules.js?v=6"></script>
   <script>
     (() => {
       "use strict";
@@ -1089,7 +1089,7 @@
             adm:asset.adm,
             eng:asset.eng,
             canalName:asset.canal,
-            canalCode:"",
+            canalCode:window.IrrigationSync.displayRecordCode(recordId,"canal_profile"),
             canalClass:"",
             sourceCanal:"",
             startKm:null,
@@ -1657,7 +1657,7 @@
       },60000);
 
       if ("serviceWorker" in navigator) {
-        navigator.serviceWorker.register("./sw.js?v=sector-platform-5",{updateViaCache:"none"}).catch(() => undefined);
+        navigator.serviceWorker.register("./sw.js?v=sector-platform-6",{updateViaCache:"none"}).catch(() => undefined);
       }
 
       initializeSync();

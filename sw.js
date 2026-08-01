@@ -1,5 +1,5 @@
 const CACHE_PREFIX = "irrigation-sector-admins-";
-const CACHE = "irrigation-sector-admins-sector-platform-5";
+const CACHE = "irrigation-sector-admins-sector-platform-6";
 const ROOT = new URL("./", self.registration.scope);
 const CORE = [
   new URL("./index.html", ROOT).href,

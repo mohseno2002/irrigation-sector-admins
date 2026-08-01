@@ -357,7 +357,12 @@
       activeId = existing?.recordId || sync.makeRecordId(type);
       const recordCode = root.IrrigationSync.displayRecordCode(activeId, type);
       title.textContent = existing ? "تعديل " + definition.singular : "إضافة " + definition.singular;
-      fields.innerHTML = '<label class="field full"><span>كود السجل</span><div class="record-code-field"><input value="' + escapeHtml(recordCode) + '" readonly><button class="record-code-button" type="button" data-copy-record-code="' + escapeHtml(recordCode) + '">نسخ الكود</button></div></label><label class="field full"><span>الإدارة</span><input value="' + escapeHtml(adm) + '" readonly></label>' + definition.fields.map((field) => fieldControl(field, existing?.[field.key])).join("");
+      fields.innerHTML = '<label class="field full"><span>كود السجل الرقمي</span><div class="record-code-field"><input value="' + escapeHtml(recordCode) + '" readonly><button class="record-code-button" type="button" data-copy-record-code="' + escapeHtml(recordCode) + '">نسخ الكود</button></div></label><label class="field full"><span>الإدارة</span><input value="' + escapeHtml(adm) + '" readonly></label>' + definition.fields.map((field) => {
+        const value = type === "canal_profile" && field.key === "canalCode" && !existing?.canalCode
+          ? recordCode
+          : existing?.[field.key];
+        return fieldControl(field, value);
+      }).join("");
       note.className = "dialog-note";
       note.textContent = existing?.locallyPending ? "هذا السجل لديه تعديل محلي بانتظار المزامنة." : "سيُحفظ السجل محليًا فورًا ثم يتزامن مع جميع الأجهزة.";
       deleteButton.hidden = !existing;
