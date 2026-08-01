@@ -53,6 +53,25 @@
     return cleanType + "-" + fnv1a64(identity);
   }
 
+  function displayRecordCode(recordId, entityType) {
+    const prefixes = {
+      asset: "AST",
+      property: "PRP",
+      canal_profile: "CNL",
+      license: "LIC",
+      violation: "VIO",
+      removal_decision: "REM",
+      human_resource: "HR",
+      lined_canal: "LIN",
+    };
+    const cleanType = cleanEntityType(entityType || "asset");
+    const suffix = fnv1a64(String(recordId || ""))
+      .slice(-8)
+      .toUpperCase()
+      .padStart(8, "0");
+    return (prefixes[cleanType] || "REC") + "-" + suffix;
+  }
+
   function cleanEntityType(value) {
     const entityType = String(value || "asset").trim();
     return /^[a-z][a-z0-9_]{0,39}$/.test(entityType) ? entityType : "asset";
@@ -319,5 +338,5 @@
     };
   }
 
-  root.IrrigationSync = { createSyncManager, stableRecordId, stableEntityRecordId };
+  root.IrrigationSync = { createSyncManager, stableRecordId, stableEntityRecordId, displayRecordCode };
 })(typeof window !== "undefined" ? window : globalThis);
