@@ -1,0 +1,29 @@
+{
+  "name": "إدارات قطاع الري",
+  "short_name": "إدارات الري",
+  "description": "منصة إدارات قطاع الري وهندساتها وترعها ومنشآتها المائية",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f9fb",
+  "theme_color": "#073b5c",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "/pwa-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "استعراض الإدارات",
+      "short_name": "الإدارات",
+      "url": "/#administrations"
+    }
+  ]
+}
