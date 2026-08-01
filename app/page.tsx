@@ -48,6 +48,19 @@ type WorkspaceTab = "structure" | "assets" | "coverages" | "properties" | "quali
 
 type FocusLevel = "engineers" | "canals" | "assets";
 
+type DiagState = {
+  w: number;
+  h: number;
+  vv: number;
+  scale: number;
+  m640: boolean;
+  m1000: boolean;
+  y: number;
+  maxY: number;
+  jumps: number;
+  lastJump: number;
+};
+
 type InstallPromptEvent = Event & {
   prompt: () => Promise<void>;
   userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
@@ -145,6 +158,7 @@ export default function Home() {
   const [showInstallGuide, setShowInstallGuide] = useState(false);
   const [online, setOnline] = useState(true);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [diag, setDiag] = useState<DiagState | null>(null);
 
   useEffect(() => {
     fetch("/data/sector.json")
@@ -169,6 +183,53 @@ export default function Home() {
     };
     window.addEventListener("beforeinstallprompt", installHandler);
     return () => window.removeEventListener("beforeinstallprompt", installHandler);
+  }, []);
+
+  useEffect(() => {
+    if (!window.location.search.includes("diag")) return;
+    let lastY = window.scrollY;
+    let maxY = window.scrollY;
+    let jumps = 0;
+    let lastJump = 0;
+    let queued = false;
+    const read = (): DiagState => ({
+      w: window.innerWidth,
+      h: window.innerHeight,
+      vv: window.visualViewport ? Math.round(window.visualViewport.height) : 0,
+      scale: window.visualViewport ? Math.round(window.visualViewport.scale * 100) / 100 : 1,
+      m640: window.matchMedia("(max-width: 640px)").matches,
+      m1000: window.matchMedia("(max-width: 1000px)").matches,
+      y: Math.round(window.scrollY),
+      maxY: Math.round(maxY),
+      jumps,
+      lastJump,
+    });
+    const push = () => {
+      if (queued) return;
+      queued = true;
+      window.requestAnimationFrame(() => {
+        queued = false;
+        setDiag(read());
+      });
+    };
+    const onScroll = () => {
+      const y = window.scrollY;
+      if (y > maxY) maxY = y;
+      const delta = y - lastY;
+      if (delta < -60) {
+        jumps += 1;
+        lastJump = Math.round(delta);
+      }
+      lastY = y;
+      push();
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.visualViewport?.addEventListener("resize", push);
+    setDiag(read());
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.visualViewport?.removeEventListener("resize", push);
+    };
   }, []);
 
   useEffect(() => {
@@ -672,7 +733,7 @@ export default function Home() {
         </nav>
         <div className="drawer-foot">
           <span className={online ? "drawer-state" : "drawer-state offline"}><i />{online ? "متصل · البيانات محمّلة" : "أوفلاين · النسخة المحفوظة"}</span>
-          <small>{number.format(totals.assets)} منشأة · الإصدار 3.0</small>
+          <small>{number.format(totals.assets)} منشأة · الإصدار 3.1</small>
         </div>
       </aside>
 
@@ -695,7 +756,17 @@ export default function Home() {
         </div>
       )}
 
-      <footer><b>إدارات قطاع الري</b><span>مبني على سجل البيانات المرفق دون إضافة بيانات افتراضية.</span><small>الإصدار 3.0</small></footer>
+      {diag && (
+        <div className="diag-badge">
+          <b>لوحة التشخيص</b>
+          <span>العرض {diag.w}×{diag.h} · نافذة مرئية {diag.vv}</span>
+          <span>≤640 {diag.m640 ? "✓" : "✗"} · ≤1000 {diag.m1000 ? "✓" : "✗"} · تكبير {diag.scale}</span>
+          <span>y={diag.y} · أقصى {diag.maxY}</span>
+          <span>قفزات للأعلى: {diag.jumps}{diag.lastJump ? ` · آخرها ${diag.lastJump}` : ""}</span>
+        </div>
+      )}
+
+      <footer><b>إدارات قطاع الري</b><span>مبني على سجل البيانات المرفق دون إضافة بيانات افتراضية.</span><small>الإصدار 3.1</small></footer>
     </main>
   );
 }

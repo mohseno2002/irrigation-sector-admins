@@ -1,4 +1,4 @@
-const CACHE = "irrigation-sector-admins-github-v7";
+const CACHE = "irrigation-sector-admins-github-v8";
 const ROOT = new URL("./", self.registration.scope).href;
 const CORE = ["./", "./data/sector.json.gz", "./manifest.webmanifest", "./pwa-icon.svg"]
   .map((path) => new URL(path, ROOT).href);
